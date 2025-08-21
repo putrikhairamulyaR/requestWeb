@@ -190,7 +190,7 @@
       el.style.display = 'block';
     }
 
-    function login() {
+    async function login() {
       clearMessages();
       const cred = {
         nip: document.getElementById('login-nip').value.trim(),
@@ -200,31 +200,45 @@
         return showLoginMessage('NIP dan Password wajib diisi.', false);
       }
       showLoginMessage('Memproses login...', true);
-      google.script.run
-        .withSuccessHandler(res=>{
-          if (res.success && res.token) {
-            sessionStorage.setItem('sessionToken', res.token);
-            const target = res.isAdmin? 'admin':'form';
-            navigateToPage(target);
-          } else {
-            showLoginMessage(res.message, false);
-          }
-        })
-        .loginUser(cred);
+      
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(cred)
+        });
+        
+        const res = await response.json();
+        
+        if (res.success && res.token) {
+          sessionStorage.setItem('sessionToken', res.token);
+          sessionStorage.setItem('userNip', res.user.nip);
+          sessionStorage.setItem('userNama', res.user.nama);
+          
+          // Cek apakah admin
+          const isAdmin = res.user.nip === '400199';
+          const target = isAdmin ? 'admin' : 'form';
+          navigateToPage(target);
+        } else {
+          showLoginMessage(res.message || 'Login gagal', false);
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        showLoginMessage('Terjadi kesalahan pada server', false);
+      }
     }
 
     function navigateToPage(pageName) {
       const token = sessionStorage.getItem('sessionToken');
-      google.script.run
-        .withSuccessHandler(html=>{
-          document.open();
-          document.write(html);
-          document.close();
-        })
-        .withFailureHandler(err=>{
-          document.body.innerHTML = `<h2>Error</h2><p>${err.message}</p>`;
-        })
-        .getPageContent(pageName, token);
+      if (!token) {
+        showLoginMessage('Sesi tidak valid', false);
+        return;
+      }
+      
+      // Redirect ke halaman yang sesuai
+      window.location.href = `/${pageName}`;
     }
   </script>
 </body>
