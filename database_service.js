@@ -527,17 +527,32 @@ class DatabaseService {
     if (!nip) return [];
 
     try {
-      // Ambil semua pengajuan libur
+      // Ambil semua pengajuan libur (format tanggal ke YYYY-MM-DD untuk hindari timezone shift)
       const sql = `
-        SELECT tanggal, COUNT(*) as total
-        FROM request 
+        SELECT DATE_FORMAT(tanggal, '%Y-%m-%d') AS tgl, COUNT(*) AS total
+        FROM request
         WHERE jenis_pengajuan = 'libur'
-        GROUP BY tanggal
-        HAVING total >= 5
+        GROUP BY tgl
       `;
       const results = await this.db.query(sql);
 
-      return results.map(row => row.tanggal.toISOString().split('T')[0]);
+      // Ambil tanggal merah (libur nasional)
+      const holidayRows = await this.getTanggalMerah();
+      const holidaySet = new Set(holidayRows || []);
+
+      // Tentukan tanggal yang sudah mencapai kuota
+      const disabled = [];
+      for (const row of results) {
+        const tgl = row.tgl;
+        const dateObj = new Date(tgl + 'T00:00:00');
+        const day = dateObj.getDay(); // 0 Minggu, 6 Sabtu
+        const isWeekend = (day === 0 || day === 6);
+        const isHoliday = holidaySet.has(tgl);
+        const quota = (isWeekend || isHoliday) ? 10 : 5;
+        if (row.total >= quota) disabled.push(tgl);
+      }
+
+      return disabled;
     } catch (error) {
       console.error('Get tanggal disable error:', error);
       return [];
@@ -550,9 +565,23 @@ class DatabaseService {
 
   async getTanggalMerah() {
     try {
-      // Untuk sementara kembalikan array kosong karena tabel libur_nasional belum ada
-      // Bisa ditambahkan nanti jika diperlukan
-      return [];
+      // Coba baca dari tabel libur_nasional (kolom tanggal tipe DATE)
+      let rows = await this.db.query(
+        `SELECT DATE_FORMAT(tanggal, '%Y-%m-%d') AS tgl FROM libur_nasional ORDER BY tanggal`
+      );
+
+      // Jika tabel/kolom berbeda nama (mis-typed), coba fallback libur_nasiol
+      if (!rows || rows.length === 0) {
+        try {
+          rows = await this.db.query(
+            `SELECT DATE_FORMAT(tanggal, '%Y-%m-%d') AS tgl FROM libur_nasiol ORDER BY tanggal`
+          );
+        } catch (e) {
+          // ignore fallback failure
+        }
+      }
+
+      return Array.isArray(rows) ? rows.map(r => r.tgl).filter(Boolean) : [];
     } catch (error) {
       console.error('Get tanggal merah error:', error);
       return [];

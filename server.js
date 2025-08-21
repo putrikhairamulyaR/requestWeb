@@ -297,9 +297,11 @@ app.post('/api/initial', async (req, res) => {
     }
 
     const jatah = await dbService.getSisaJatah(token);
-    const disableDatesLibur = await dbService.getTanggalDisableUser(token);
-    const pengajuan = await dbService.getPengajuanUser(token);
-    const tanggalMerah = await dbService.getTanggalMerah();
+    const [disableDatesLibur, pengajuan, tanggalMerah] = await Promise.all([
+      dbService.getTanggalDisableUser(token),
+      dbService.getPengajuanUser(token),
+      dbService.getTanggalMerah()
+    ]);
     
     res.json({ 
       success: true, 

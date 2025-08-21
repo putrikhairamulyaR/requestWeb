@@ -738,6 +738,9 @@
     }
 
     function initFlatpickr(jatah, disableDatesLibur, tanggalMerah) {
+      // Gabungkan tanggal merah agar selalu nonaktif di Form Libur
+      const disableLibur = Array.from(new Set([...(disableDatesLibur || []), ...(tanggalMerah || [])]));
+
       // LIBUR
       setupTanggalInput({
         jenis: 'Sisa Request Libur',
@@ -746,7 +749,7 @@
         labelId: 'labelLibur',
         noticeId: 'noticeLibur',
         jatahTersisa: jatah.liburTersisa,
-        disableDates: disableDatesLibur
+        disableDates: disableLibur
       });
 
       // CUTI TAHUNAN (user isi manual)
@@ -900,11 +903,13 @@
           wrapper.appendChild(document.createElement('br'));
           wrapper.appendChild(info);
         } else {
+          const ds = Array.isArray(disableDates) ? disableDates : [];
+          const dset = new Set(ds);
           flatpickr(input, {
             mode: 'single',
             dateFormat: 'Y-m-d',
             minDate: 'today',
-            disable: disableDates
+            disable: [ (date) => dset.has(formatDate(date)) ]
           });
           input.placeholder = `Pilih tanggal`;
         }
