@@ -2,12 +2,13 @@
 // KONFIGURASI DATABASE MYSQL
 // =================================================================
 
+// Gunakan variabel lingkungan agar mudah dikonfigurasi saat deploy (Docker/K8s)
 const dbConfig = {
-  host: 'localhost',
-  user: 'root',
-  password: '', // Password kosong sesuai dengan database Anda
-  database: 'web',
-  port: 3306,
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD === undefined ? '' : process.env.DB_PASSWORD,
+  database: process.env.DB_NAME || 'web',
+  port: Number(process.env.DB_PORT || 3306),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -15,4 +16,4 @@ const dbConfig = {
   timeout: 60000
 };
 
-module.exports = dbConfig; 
+module.exports = dbConfig;
