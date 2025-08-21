@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Form Pengajuan</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <style>
+    /* BASE STYLES (applied to both desktop and mobile) */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      font-size: 18px;
+    }
+    .material-icons-outlined {
+      font-size: 40px !important;
+      margin-right: 15px;
+      color: #d80000;
+    }
+    .message {
+      margin-top: 18px;
+      padding: 14px 20px;
+      display: none;
+      border-radius: 6px;
+      word-break: break-word;
+      font-size: 17px;
+    }
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+    }
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .loading {
+      text-align: center;
+      color: #008000;
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 18px;
+      display: none;
+    }
+    .notice {
+      margin-top: 15px;
+      color: #d80000;
+      text-align: center;
+      font-size: 11px !important;
+      margin-bottom: 10px;
+    }
+    .loading-icon {
+      animation: spin 1s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+      color: #fff;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+      /* DESKTOP & LAPTOP STYLES */
+      body {
+        display: flex;
+        flex-direction: row;
+        margin: 0;
+        min-height: 100vh;
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        font-size: 18px;
+        overflow-x: hidden; /* Mencegah horizontal scroll */
+      }
+
+    /* === GAYA UNTUK TOP BAR BARU === */
+
+    /* Mengatur layout utama halaman */
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Gaya dasar Top Bar */
+    .top-bar {
+      width: 100%;
+      background-color: #f8f8f8;
+      padding: 20px 30px;
+      border-bottom: 2px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-sizing: border-box;
+    }
+    .top-bar a {
+      font-size: 40px !important;
+      color: #d80000;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: color .2s;
+    }
+    .top-bar a:hover {
+      color: #d80000;
+    }
+    .top-bar .material-icons-outlined {
+        font-size: 40px !important;
+        margin-right: 8px;
+    }
+
+      /* Gaya Dropdown Menu */
+      .dropdown {
+        position: relative;
+        display: inline-block;
+      }
+      .dropdown .dropdown-toggle {
+        cursor: pointer;
+      }
+      #userNipDisplay {
+        margin: 0 5px;
+      }
+      .dropdown-menu {
+        display: none; /* Sembunyi */
+        position: absolute;
+        right: 0;
+        background-color: #ffffff;
+        min-width: 200px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        border-radius: 8px;
+        z-index: 100;
+        margin-top: 10px;
+        overflow: hidden;
+      }
+      .dropdown-menu a {
+        color: #333;
+        padding: 12px 18px;
+        font-size: 40px !important;
+      }
+      .dropdown-menu a:hover {
+        background-color: #f1f1f1;
+      }
+      .dropdown-menu.show {
+        display: block; /* Tampilkan */
+      }
+
+      /* Penyesuaian untuk .content agar pas di bawah top-bar */
+      .content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 30px;
+      }
+
+      /* Penyesuaian di layar mobile */
+      @media (max-width: 768px) {
+        .top-bar { padding: 10px 15px; }
+        .top-bar a { font-size: 40px !important;; }
+        .top-bar a #userNipDisplay { display: none; } /* Sembunyikan nama di mobile */
+        .dropdown-menu { min-width: 160px; }
+        .content { padding: 15px; }
+      }
+
+      .content {
+        flex: 1;
+        padding: 40px 30px;
+        overflow-y: auto;
+        box-sizing: border-box;
+        min-width: 0;
+      }
+
+      .form-container {
+        background: white;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.12);
+      }
+
+      h2, h3 {
+        text-align: center;
+        color: #000000;
+        font-size: 32px !important;
+      }
+
+      label {
+        display: block;
+        margin-top: 20px;
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+
+      /*input {
+        width: 100%;
+        height: 60px !important;
+        padding: 18px 20px !important;
+        font-size: 26px !important;
+        font-style: italic;
+        margin-top: 12px;
+        border-radius: 12px !important;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+      }*/
+      .form-container input {
+        width: 100%;
+        height: 60px !important;
+        padding: 18px 20px !important;
+        font-size: 26px !important;
+        font-style: italic;
+        margin-top: 12px;
+        border-radius: 12px !important;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+      }
+
+      input.flatpickr-input {
+        font-size: 32px !important;
+        padding: 30px !important;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      button {
+        margin-top: 35px;
+        background-color: #d80000;
+        color: white;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        font-size: 20px;
+        padding: 18px 32px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        display: block;
+        width: 100%;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      button:hover {
+        background-color: #a80000;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .flatpickr-input::placeholder {
+        font-size: 30px !important;
+        margin-top: -100px !important;
+        color: #888;   
+      }
+
+      input[type="date"],
+      input[type="time"],
+      input[type="datetime-local"],
+      select {
+        font-size: 24px;
+        padding: 18px 16px;
+        border-radius: 10px;
+        border: 2px solid #ccc;
+        margin-top: 12px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .form-container h3:first-of-type {
+        margin-top: -20px;
+      }
+
+      .riwayat-container {
+          background: white;
+          max-width: 1000px; /* max-width ini penting untuk centering */
+          
+          /* FIX: Atur margin atas 0, kanan-kiri auto, dan bawah 30px.
+            'auto' pada margin kiri dan kanan akan membuatnya otomatis ke tengah.
+          */
+          margin: 0 auto 30px auto; 
+          
+          padding: 30px 25px;
+          border-radius: 12px;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Penyesuaian judul riwayat */
+      #riwayat-section h2 {
+        margin-bottom: 20px !important; /* Jarak bawah judul ke container */
+        text-align: center;
+        display: block;
+        width: 100%;
+      }
+
+      .riwayat-container table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 34px !important;
+        min-width: 600px;
+        table-layout: auto;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      }
+
+      .riwayat-container th, 
+      .riwayat-container td {
+        border: 1px solid #ddd;
+        padding: 14px 16px;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .riwayat-container th {
+        background-color: #f9f9f9;
+        color: #d80000;
+        font-weight: bold;
+        font-size: 32px !important;
+      }
+
+      .riwayat-container td {
+        font-size: 32px !important;
+        color: #333;
+        background-color: #fff;
+      }
+
+      .riwayat-container h3 {
+        font-size: 26px;
+        color: #d80000;
+        margin-bottom: 25px;
+        text-align: center;
+        font-weight: 600;
+      }
+
+      .riwayat-container tr:nth-child(even) td {
+        background-color: #f7f7f7;
+      }
+
+      #jumlahLibur{
+        display: none;
+      }
+
+
+    /* MOBILE STYLES (exactly as in original) */
+    @media only screen and (max-width: 1080px) {
+      .flatpickr-calendar {
+        font-size: 16px; /* agak dibesarin biar jelas */
+      }
+
+      .flatpickr-months {
+        height: auto !important; /* pastikan tidak kepotong */
+        padding: 5px 0 !important;
+      }
+
+      .flatpickr-month {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+
+      .flatpickr-current-month {
+        padding-top: 0 !important;
+        height: auto !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-weight: bold;
+        font-size: 16px !important;
+      }
+
+      /* Tombol prev & next supaya tidak nutup tulisan */
+      .flatpickr-prev-month,
+      .flatpickr-next-month {
+        top: 5px !important;
+      }
+      /* Label */
+      #labelCuti{
+        font-size: 20px !important;
+        font-weight: bold;
+        color: #666666;
+        display: block;
+        padding: 8px;
+        padding: 10px !important;
+      }
+      #labelCutiLain{
+        font-size: 20px !important;
+        font-weight: bold;
+        color: #666666;
+        display: block;
+        padding: 8px !important;
+      }
+      #labelLibur{
+          font-size: 20px !important;
+          font-weight: bold;
+          color: #666666;
+          display: block;
+          margin-top : 20px !important;
+          margin-bottom: -20px !important;
+        }
+      input[type="number"]::placeholder,
+      input::placeholder {
+        font-size: 24px !important;
+        font-style: italic;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background: #f7f7f7;
+        font-size: 18px;
+        display: block;
+        height: auto;
+        overflow-x: hidden;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: 50px;
+        flex-direction: row;
+        overflow-x: auto;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+        padding: 25px 20px;
+        box-shadow: none;
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 20px;
+      }
+
+      .sidebar h2 {
+        display: none;
+      }
+
+      .sidebar-buttons-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding: 0 10px;
+        box-sizing: border-box;
+      }
+
+      #goToPengajuanUlang {
+        margin-top: 15px !important;
+        margin-left: 8px;
+      }
+
+      #logoutButton {
+        margin-top: 15px !important;
+        margin-right: 45px !important;
+      }
+
+      .sidebar-buttons-wrapper a {
+        font-size: 30px;
+        padding: 10px;
+        border-radius: 10px;
+        background-color: #f0f0f0;
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+        margin-bottom: 20 px;
+      }
+
+      .sidebar a:hover {
+        background-color: #d80000;
+        color: #fff;
+      }
+
+      .content {
+        width: 100%;
+        padding: 20px;
+        margin-top: 20px;
+        overflow: visible;
+      }
+
+      .form-container {
+        width: 90%;
+        margin: 0 auto 30px auto;
+        padding: 20px auto;
+        box-sizing: border-box;
+        overflow: visible;
+        max-height: none;
+        margin-top: 40px !important;
+        margin-left: 30px !important;
+      }
+
+      .riwayat-container {
+        background: white;
+        width:90%;
+        margin: 30px auto;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+        overflow-x: auto;
+        box-sizing: border-box;
+      }
+
+      .riwayat-container table {
+        width: 100%;
+        min-width: 300px;
+        border-collapse: collapse;
+        font-size: 32px !important;
+        padding: 20 px;
+        text-align : left;
+      }
+
+      .riwayat-container th, 
+      .riwayat-container td {
+        border: 1px solid #ccc;
+        padding: 10px 14px;
+        text-align: center;
+      }
+      .riwayat-container h4 {
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 32px !important;
+        color: #000000;
+        padding: 15 px;
+      }
+
+      h2, h3 {
+        font-size: 40px !important;
+      }
+
+      label {
+        font-size: 16px;
+      }
+
+      input[type="date"],
+      input[type="time"],
+      input[type="datetime-local"],
+      select {
+        font-size: 38px;
+        padding: 18px 20px;
+        border-radius: 12px;
+        border: 1.8px solid #ccc;
+        margin-top: 14px;
+        width: 80%;
+        box-sizing: border-box;
+      }
+
+      button {
+        width: 75%;
+        padding: 28px 40px;
+        background: #d80000;
+        border: none;
+        color: white;
+        font-weight: bold;
+        font-size: 30px;
+        cursor: pointer;
+        border-radius: 100px;
+        margin-top: 28px;
+        margin-bottom:25px;
+      }
+
+      .message {
+        font-size: 16px;
+        padding: 16px;
+      }
+
+      .notice {
+        font-size: 12px !important;
+        font-weight: normal;
+        color: #d80000;
+        text-align: center;
+        margin-top: 16px;
+      }
+
+      input.flatpickr-input {
+        font-size: 32px !important;
+        padding: 10px !important;
+        border-radius: 12px;
+        border: 1.8px solid #ccc;
+        margin-top: 14px;
+        width: 100%;
+        box-sizing: border-box;
+        margin-top:-50px;
+      }
+
+      .flatpickr-input::placeholder {
+        font-size: 30px !important;
+        margin-top: -100px !important;
+        color: #888;   
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- POPUP KONFIRMASI -->
+  <div id="popup" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background-color: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background-color: white; padding: 40px 30px; border-radius: 12px; max-width: 90%; width: 400px; text-align: center;">
+      <h3 style="color: #008000; font-size: 32px; margin-bottom: 20px;">Pengajuan Berhasil</h3>
+      <p style="font-size: 32px; margin-bottom: 25px;">Data pengajuan Anda telah disimpan.</p>
+      <button onclick="closePopup()" style="padding: 14px 30px; font-size: 30px; background-color: #d80000; color: white; border: none; border-radius: 8px; cursor: pointer;">OK</button>
+    </div>
+  </div>
+  <!-- POPUP KONFIRMASI LOGOUT -->
+  <div id="popupLogout" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+    <div style="background:#fff; padding:40px 50px; border-radius:14px; text-align:center; max-width: 500px; width: 90%;">
+      <p style="font-size: 32px; margin-bottom: 30px;">Apakah Anda yakin ingin logout?</p>
+      <div style="display: flex; justify-content: center; gap: 20px;">
+        <button onclick="prosesLogout()" style="padding: 12px 28px; font-size: 30px; background-color: #d80000; color: white; border: none; border-radius: 8px; cursor: pointer;">Ya</button>
+        <button onclick="tutupPopupLogout()" style="padding: 12px 28px; font-size: 30px; background-color: #888; color: white; border: none; border-radius: 8px; cursor: pointer;">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP INFO / PEMBERITAHUAN -->
+  <div id="popupInfo" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background-color: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background-color: white; padding: 50px 40px; border-radius: 16px; max-width: 600px; width: 90%; text-align: center;">
+      <h3 style="color: #d80000; font-size: 32px; margin-bottom: 25px;">Pemberitahuan</h3>
+      <p id="popupInfoMessage" style="font-size: 32px; margin-bottom: 30px;">Pesan info</p>
+      <button onclick="closeInfoPopup()" style="padding: 16px 36px; font-size: 20px; background-color: #d80000; color: white; border: none; border-radius: 10px; cursor: pointer;">OK</button>
+    </div>
+  </div>
+
+  <div class="top-bar">
+  <a id="goToPengajuanUlang">
+    <span class="material-icons-outlined">edit_calendar</span>
+    Pengajuan Ulang
+  </a>
+
+  <div class="dropdown">
+    <a id="userDropdownToggle" class="dropdown-toggle">
+      <span class="material-icons-outlined">account_circle</span>
+      <span id="userNipDisplay"><?= nip ?></span> <span class="material-icons-outlined">arrow_drop_down</span>
+    </a>
+    <div id="userDropdownMenu" class="dropdown-menu">
+      <a id="logoutLink">
+        <span class="material-icons-outlined">logout</span>
+        Logout
+      </a>
+    </div>
+  </div>
+</div>
+
+
+  </div>
+
+  <div class="content">
+    <!-- Form Pengajuan DIPINDAH KE SINI -->
+    <h2 style="text-align:; color:#d80000; font-size:50px !important; margin-top: -20px !important; margin-left: 25 px;">Form Pengajuan</h2>
+
+    <div class="form-container">
+      <!-- LIBUR -->
+      <h3 style="margin-top: 20px;">Pengajuan Libur</h3>
+      <label id="labelLibur">Sisa request Libur: Memuat...</label>
+      <input type="number" id="jumlahLibur" min="1" max="31" placeholder=" Request libur yang ingin diajukan, Contoh: 2" />
+      <div id="tanggalLiburContainer"></div>
+      <div id="noticeLibur" class="notice" style="display:none;"></div>
+
+      <!-- CUTI TAHUNAN -->
+      <h3>Pengajuan Cuti Tahunan</h3>
+      <label id="labelCuti">Sisa Cuti Tahunan: Memuat...</label>
+      <input type="number" id="jumlahCuti" min="1" max="31" placeholder="Request cuti tahunan yang ingin diajukan, Contoh: 2" />
+      <div id="tanggalCutiContainer"></div>
+      <div id="noticeCuti" class="notice" style="display:none;"></div>
+
+      <!-- CUTI CAP -->
+      <h3>Pengajuan CAP</h3>
+      <label id="labelCutiLain">Max Cuti CAP (3 hari): Memuat...</label>
+      <input type="number" id="jumlahCutiLain" min="1" max="31" placeholder="Request CAP yang ingin diajukan,Contoh: 2" />
+      <div id="tanggalCutiLainContainer"></div>
+      <div id="noticeCutiLain" class="notice" style="display:none;"></div>
+
+      <center><button id="ajukanButton" onclick="ajukan()">Ajukan</button></center>
+      <div class="loading" id="loading">⏳ Mengirim pengajuan...</div>
+      <div id="pesan" class="message"></div>
+    </div>
+
+    <div id="riwayat-section">
+      <h2 style="text-align:center; color:#d80000; font-size:50px !important; margin-left: 30px !important margin-right: 30px !important;">Riwayat Pengajuan</h2>
+      <div class="riwayat-container">
+        <div id="hasilLibur"></div>
+        <div id="hasilCuti"></div>
+        <div id="hasilCutiLain"></div>
+      </div>
+  </div>
+</div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js"></script>
+  <script>
+        // State global tunggal, aman walau halaman dimuat ulang
+    window.__APP__ = window.__APP__ || { isSubmitting: false };
+    // (opsional) matikan global lama bila ada
+    delete window.isSubmitting;
+    var sessionToken = sessionStorage.getItem("sessionToken");
+    var fpLibur, fpCuti, fpCutiLain;
+
+    // --- FUNGSI BARU UNTUK MENGAKTIFKAN DROPDOWN ---
+  function setupDropdownMenu() {
+    const dropdownToggle = document.getElementById('userDropdownToggle');
+    const dropdownMenu = document.getElementById('userDropdownMenu');
+
+    if (dropdownToggle && dropdownMenu) {
+      dropdownToggle.addEventListener('click', function(event) {
+        event.stopPropagation();
+        dropdownMenu.classList.toggle('show');
+      });
+      window.addEventListener('click', function(event) {
+        if (!dropdownToggle.contains(event.target) && dropdownMenu.classList.contains('show')) {
+          dropdownMenu.classList.remove('show');
+        }
+      });
+    }
+  }
+
+    // --- FUNGSI BARU UNTUK MENAMPILKAN INFO USER (NIP/NIK) ---
+    function displayUserInfo() {
+      const nipDisplay = document.getElementById('userNipDisplay');
+      if (!sessionToken) {
+        nipDisplay.textContent = 'GUEST';
+        return;
+      }
+      // Panggil fungsi di server untuk mendapatkan info user berdasarkan token
+      google.script.run
+        .withSuccessHandler(userInfo => {
+          if (userInfo && userInfo.nip) {
+            nipDisplay.textContent = userInfo.nip;
+          } else {
+            nipDisplay.textContent = 'User';
+          }
+        })
+        .withFailureHandler(err => {
+          console.error("Gagal mengambil info user:", err);
+          nipDisplay.textContent = 'Error';
+        })
+        .getUserInfoByToken(sessionToken);
+    }
+
+    function showMessage(msg, success = true) {
+      const el = document.getElementById("pesan");
+      el.textContent = msg;
+      el.className = "message " + (success ? "success" : "error");
+      el.style.display = "block";
+    }
+
+    function setLoading(show) {
+      document.getElementById("loading").style.display = show ? "block" : "none";
+      document.getElementById("ajukanButton").disabled = show;
+    }
+
+    function formatDate(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,'0');
+      const dd= String(d.getDate()).padStart(2,'0');
+      return `${y}-${m}-${dd}`;
+    }
+
+    function navigateToPage(page) {
+      document.body.innerHTML = '<h2 style="text-align:center; margin-top:50px;">Memuat halaman...</h2>';
+      google.script.run
+        .withSuccessHandler(html=>{document.open(); document.write(html); document.close(); })
+        .withFailureHandler(err=>showMessage(err.message,false))
+        .getPageContent(page, sessionToken);
+    }
+
+    function initFlatpickr(jatah, disableDatesLibur, tanggalMerah) {
+      // LIBUR
+      setupTanggalInput({
+        jenis: 'Sisa Request Libur',
+        jumlahId: 'jumlahLibur',
+        containerId: 'tanggalLiburContainer',
+        labelId: 'labelLibur',
+        noticeId: 'noticeLibur',
+        jatahTersisa: jatah.liburTersisa,
+        disableDates: disableDatesLibur
+      });
+
+      // CUTI TAHUNAN (user isi manual)
+      setupTanggalInput({
+        jenis: ' Sisa Cuti Tahunan',
+        jumlahId: 'jumlahCuti',
+        containerId: 'tanggalCutiContainer',
+        labelId: 'labelCuti',
+        noticeId: 'noticeCuti',
+        jatahTersisa: jatah.cutiTersisa,
+        disableDates: tanggalMerah
+      });
+
+      // CUTI CAP
+      setupTanggalInput({
+        jenis: 'Cuti CAP',
+        jumlahId: 'jumlahCutiLain',
+        containerId: 'tanggalCutiLainContainer',
+        labelId: 'labelCutiLain',
+        noticeId: 'noticeCutiLain',
+        jatahTersisa: jatah.cutiLainTersisa,
+        disableDates: tanggalMerah
+      });
+    }
+
+    /*(function setupTanggalInput({ jenis, jumlahId, containerId, labelId, noticeId, jatahTersisa, disableDates }) {
+      const label = document.getElementById(labelId);
+      const jumlahInput = document.getElementById(jumlahId);
+      const container = document.getElementById(containerId);
+      const notice = document.getElementById(noticeId);
+
+      label.textContent = `${jenis}: ${jatahTersisa} hari`;
+      container.innerHTML = '';
+      notice.style.display = 'none';
+
+      // Untuk Cuti Tahunan: input manual
+      const isCutiTahunan = jumlahId === 'jumlahCuti';
+
+      if (!isCutiTahunan) {
+        // Untuk Libur dan Cuti CAP (langsung generate input berdasarkan jatah)
+        const jumlah = jatahTersisa > 0 ? jatahTersisa : 1;
+        jumlahInput.value = jatahTersisa;
+        jumlahInput.disabled = true;
+
+        renderTanggalInput(jumlah, jenis, jumlahId, container, disableDates, jatahTersisa, notice);
+
+        // Jika jatah habis, popup muncul saat klik input tanggal
+        if (jatahTersisa === 0) {
+          showInfoPopup(`Sisa request ${jenis.toLowerCase()} Anda telah habis. Klik tombol Pengajuan Ulang untuk merevisi pengajuan ${jenis.toLowerCase()} Anda.`);
+        }
+
+      } else {
+        // Untuk Cuti Tahunan
+        jumlahInput.disabled = false;
+        jumlahInput.value = '';
+
+        jumlahInput.addEventListener('input', function () {
+          const jumlah = parseInt(this.value);
+          container.innerHTML = '';
+          notice.style.display = 'none';
+
+          if (isNaN(jumlah) || jumlah <= 0) return;
+
+          if (jumlah > jatahTersisa) {
+            alert(`⚠️ Sisa cuti tahunan Anda hanya ${jatahTersisa} hari.\nSilakan sesuaikan pengajuan Anda.`);
+            return;
+          }
+
+          renderTanggalInput(jumlah, jenis, jumlahId, container, disableDates, jatahTersisa, notice);
+        });
+      }
+    }*/
+    function setupTanggalInput({ jenis, jumlahId, containerId, labelId, noticeId, jatahTersisa, disableDates }) {
+      const label = document.getElementById(labelId);
+      const jumlahInput = document.getElementById(jumlahId);
+      const container = document.getElementById(containerId);
+      const notice = document.getElementById(noticeId);
+
+      label.textContent = `${jenis}: ${jatahTersisa} hari`;
+      container.innerHTML = '';
+      notice.style.display = 'none';
+
+      // PERUBAHAN UTAMA DI SINI
+      // Kita definisikan field mana saja yang harus diisi manual oleh user.
+      const isManualInput = (jumlahId === 'jumlahCuti' || jumlahId === 'jumlahCutiLain');
+
+      // BLOK INI SEKARANG UNTUK INPUT MANUAL (Cuti Tahunan & Cuti CAP)
+      if (isManualInput) {
+          jumlahInput.disabled = false;
+          jumlahInput.value = '';
+
+          jumlahInput.addEventListener('input', function () {
+              const jumlah = parseInt(this.value);
+              container.innerHTML = '';
+              notice.style.display = 'none';
+
+              if (isNaN(jumlah) || jumlah <= 0) return;
+
+              // Logika pengecekan jatah tetap berlaku
+              if (jumlah > jatahTersisa) {
+                  alert(`⚠️ Sisa ${jenis.toLowerCase()} Anda hanya ${jatahTersisa} hari.\nSilakan sesuaikan pengajuan Anda.`);
+                  // Reset input jika melebihi jatah
+                  this.value = ''; 
+                  return;
+              }
+
+              renderTanggalInput(jumlah, jenis, jumlahId, container, disableDates, jatahTersisa, notice);
+          });
+      } 
+      // BLOK INI SEKARANG HANYA UNTUK INPUT OTOMATIS (Request Libur)
+      else { 
+          // Untuk Libur (langsung generate input berdasarkan jatah)
+          const jumlah = jatahTersisa > 0 ? jatahTersisa : 1;
+          jumlahInput.value = jatahTersisa;
+          jumlahInput.disabled = true;
+
+          renderTanggalInput(jumlah, jenis, jumlahId, container, disableDates, jatahTersisa, notice);
+
+          // Jika jatah habis, popup muncul saat klik input tanggal
+          if (jatahTersisa === 0) {
+              showInfoPopup(`Sisa request ${jenis.toLowerCase()} Anda telah habis. Klik tombol Pengajuan Ulang untuk merevisi pengajuan ${jenis.toLowerCase()} Anda.`);
+          }
+      }
+  }
+
+    function renderTanggalInput(jumlah, jenis, jumlahId, container, disableDates, jatahTersisa, notice) {
+      for (let i = 1; i <= jumlah; i++) {
+        const wrapper = document.createElement('div');
+        wrapper.style.marginBottom = '1.5px';
+
+        const labelTanggal = document.createElement('label');
+        labelTanggal.setAttribute('for', `${jumlahId}_tanggal${i}`);
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = `${jumlahId}_tanggal${i}`;
+        input.name = `${jumlahId}_tanggal${i}`;
+        input.readOnly = true;
+
+        wrapper.appendChild(labelTanggal);
+        wrapper.appendChild(document.createElement('br'));
+        wrapper.appendChild(input);
+
+        // ❌ Kalau jatah habis, input disable dan flatpickr tidak diaktifkan
+        if (jatahTersisa === 0) {
+          input.placeholder = `Pilih tanggal`;
+          input.disabled = true;
+
+          const info = document.createElement('small');
+          info.style.color = '#d80000';
+          wrapper.appendChild(document.createElement('br'));
+          wrapper.appendChild(info);
+        } else {
+          flatpickr(input, {
+            mode: 'single',
+            dateFormat: 'Y-m-d',
+            minDate: 'today',
+            disable: disableDates
+          });
+          input.placeholder = `Pilih tanggal`;
+        }
+
+        container.appendChild(wrapper);
+      }
+    }
+
+    // GANTI FUNGSI refreshData LAMA ANDA DENGAN YANG INI DI FILE .html
+
+    function refreshData() {
+      showMessage('Memuat data...', true);
+
+      // Cukup satu panggilan ke fungsi baru kita
+      google.script.run
+        .withSuccessHandler(response => {
+          // Periksa apakah server merespons dengan sukses
+          if (response && response.success) {
+            // Ambil data dari dalam paket 'response.data'
+            const { jatah, disableDatesLibur, tanggalMerah, pengajuan } = response.data;
+            
+            // Panggil fungsi-fungsi UI seperti biasa
+            initFlatpickr(jatah, disableDatesLibur, tanggalMerah);
+            tampilkanRiwayatPengajuan(pengajuan);
+            
+            showMessage('Data berhasil diperbarui.', true);
+            setTimeout(() => document.getElementById('pesan').style.display = 'none', 2000);
+          } else {
+            // Tampilkan pesan error dari server jika ada
+            const errorMessage = response ? response.message : 'Struktur respons tidak dikenal.';
+            showMessage('Gagal memuat data: ' + errorMessage, false);
+            console.error('Server returned an error:', response);
+          }
+        })
+        .withFailureHandler(err => {
+          // Handler ini untuk error koneksi
+          showMessage('Gagal terhubung ke server: ' + err.message, false);
+          console.error('Connection error:', err);
+        })
+        .getInitial(sessionToken); // Panggil fungsi baru di server
+    }
+
+    function generateTable(title, dates) {
+      if (!dates || dates.length === 0) return '';
+
+      let rows = dates.map((date, i) => `<tr><td style="padding: 10px; border: 1px solid #ccc;">${i + 1}</td><td style="padding: 10px; border: 1px solid #ccc;">${date}</td></tr>`).join('');
+
+      return `
+        <div style="margin-top: 20px;">
+          <h4 style="color: #000000; font-size: 18px; margin-bottom: 10px; text-align: center;">${title}</h4>
+          <div style="overflow-x: auto;">
+            <table style="border-collapse: collapse; width: 100%;">
+              <thead>
+                <tr style="background-color: #f4f4f4;">
+                  <th style="padding: 10px; border: 1px solid #ccc;">No</th>
+                  <th style="padding: 10px; border: 1px solid #ccc;">Tanggal</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+    function tampilkanRiwayatPengajuan(data) {
+        const { libur, cuti, cutiLain } = data;
+
+        document.getElementById('hasilLibur').innerHTML = generateTable('Libur', libur);
+        document.getElementById('hasilCuti').innerHTML = generateTable('Cuti Tahunan', cuti);
+        document.getElementById('hasilCutiLain').innerHTML = generateTable('Cuti CAP', cutiLain);
+      }
+
+      function showSuccessPopupWithDetails(succeeded = [], failed = []) {
+        // Group successes by jenis -> [tanggal...]
+        const succByJenis = succeeded.reduce((acc, r) => {
+          (acc[r.jenis] ||= []).push(r.tanggal);
+          return acc;
+        }, {});
+
+        // Group failures by jenis -> [{tanggal, message}...]
+        const failByJenis = failed.reduce((acc, r) => {
+          (acc[r.jenis] ||= []).push({ tanggal: r.tanggal, message: r.message || 'Gagal dikirim' });
+          return acc;
+        }, {});
+
+        // Build success lines
+        const successLines = Object.keys(succByJenis).length
+          ? Object.entries(succByJenis)
+              .map(([jenis, arr]) => `• ${jenis}: ${arr.join(', ')}`)
+              .join('\n')
+          : '—';
+
+        // Build failure lines
+        const failSection = Object.keys(failByJenis).length
+          ? Object.entries(failByJenis)
+              .map(([jenis, arr]) => {
+                const items = arr.map(it => `   - ${it.tanggal}: ${it.message}`).join('\n');
+                return `• ${jenis}:\n${items}`;
+              })
+              .join('\n')
+          : '—';
+
+        // Swap text in existing popup
+        const popup  = document.getElementById('popup');
+        const titleEl = popup.querySelector('h3');
+        const bodyEl  = popup.querySelector('p');
+
+        titleEl.textContent = succeeded.length ? 'Pengajuan Berhasil (Ringkasan)' : 'Tidak Ada Pengajuan Berhasil';
+        bodyEl.style.whiteSpace = 'pre-line'; // so \n renders as line breaks
+        bodyEl.textContent =
+          `✅ Berhasil:\n${successLines}\n\n` +
+          `❌ Gagal:\n${failSection}`;
+
+        popup.style.display = 'flex';
+      }
+
+
+    function ajukan() {
+      if (window.__APP__.isSubmitting) return;   // cegah spam klik
+      window.__APP__.isSubmitting = true;
+      setLoading(true);
+
+      const getDatesFromInputs = (containerId) => {
+        const container = document.getElementById(containerId);
+        const inputs = container.querySelectorAll('input[type="text"]');
+        const dates = [];
+        inputs.forEach(input => { if (input.value) dates.push(input.value); });
+        return dates;
+      };
+
+      const libur = getDatesFromInputs('tanggalLiburContainer');
+      const cuti = getDatesFromInputs('tanggalCutiContainer');
+      const cutiLain = getDatesFromInputs('tanggalCutiLainContainer');
+
+      const findInternalDuplicates = (dates, type) => {
+        const unique = new Set(dates);
+        if (unique.size !== dates.length) return `Terdapat tanggal duplikat pada pengajuan ${type}.`;
+        return null;
+      };
+
+      const liburDupError = findInternalDuplicates(libur, 'Libur');
+      if (liburDupError) { setLoading(false); window.__APP__.isSubmitting = false; return showMessage(liburDupError, false); }
+      const cutiDupError = findInternalDuplicates(cuti, 'Cuti Tahunan');
+      if (cutiDupError) { setLoading(false); window.__APP__.isSubmitting = false; return showMessage(cutiDupError, false); }
+      const cutiLainDupError = findInternalDuplicates(cutiLain, 'Cuti CAP');
+      if (cutiLainDupError) { setLoading(false); window.__APP__.isSubmitting = false; return showMessage(cutiLainDupError, false); }
+
+      if (!libur.length && !cuti.length && !cutiLain.length) {
+        setLoading(false); window.__APP__.isSubmitting = false;
+        return showMessage('Pilih minimal satu tanggal pada salah satu jenis pengajuan.', false);
+      }
+
+      const allDates = [...libur, ...cuti, ...cutiLain];
+      const duplicatesAcross = allDates.filter((item, i) => allDates.indexOf(item) !== i);
+      if (duplicatesAcross.length > 0) {
+        setLoading(false); window.__APP__.isSubmitting = false;
+        return showMessage('Terdapat tanggal yang sama antar jenis pengajuan: ' + [...new Set(duplicatesAcross)].join(', '), false);
+      }
+
+      google.script.run
+        .withFailureHandler(err => {
+          setLoading(false); window.__APP__.isSubmitting = false;
+          showMessage('Gagal ambil data lama: ' + err.message, false);
+        })
+        .withSuccessHandler(existing => {
+          const existingAll = [
+            ...(existing.libur || []),
+            ...(existing.cuti || []),
+            ...(existing.cutiLain || []),
+          ];
+          const existingSet = new Set(existingAll);
+
+          const jenisMapping = {
+            'Libur': 'Libur',
+            'Cuti Tahunan': 'Cuti',
+            'Cuti Lainnya': 'Cuti Lainnya' // ganti ke 'Cuti CAP' kalau backend pakai itu
+          };
+          const toPayloadJenis = (label) => jenisMapping[label] || label;
+
+          const jenisSebelumnya = (date) => {
+            const j = [];
+            if ((existing.libur || []).includes(date)) j.push('Libur');
+            if ((existing.cuti || []).includes(date)) j.push('Cuti Tahunan');
+            if ((existing.cutiLain || []).includes(date)) j.push('Cuti Lainnya');
+            return j.join(', ');
+          };
+
+          const makeTask = (labelTampil, tanggal) => new Promise(resolve => {
+            google.script.run
+              .withSuccessHandler(res => {
+                const ok = res && (res.success === true || res === true);
+                resolve({ success: !!ok, message: (res && res.message) || '', jenis: labelTampil, tanggal });
+              })
+              .withFailureHandler(err => {
+                resolve({ success: false, message: err?.message || 'Gagal koneksi', jenis: labelTampil, tanggal });
+              })
+              .simpanPengajuan(sessionToken, { jenis: toPayloadJenis(labelTampil), tanggal: [tanggal] });
+          });
+
+          const tasks = [];
+          const failedAlready = [];
+
+          libur.forEach(d => {
+            if (existingSet.has(d)) {
+              failedAlready.push({ success: false, jenis: 'Libur', tanggal: d, message: `Sudah pernah diajukan sebelumnya (${jenisSebelumnya(d)})` });
+            } else {
+              tasks.push(makeTask('Libur', d));
+            }
+          });
+
+          cuti.forEach(d => {
+            if (existingSet.has(d)) {
+              failedAlready.push({ success: false, jenis: 'Cuti Tahunan', tanggal: d, message: `Sudah pernah diajukan sebelumnya (${jenisSebelumnya(d)})` });
+            } else {
+              tasks.push(makeTask('Cuti Tahunan', d));
+            }
+          });
+
+          cutiLain.forEach(d => {
+            if (existingSet.has(d)) {
+              failedAlready.push({ success: false, jenis: 'Cuti Lainnya', tanggal: d, message: `Sudah pernah diajukan sebelumnya (${jenisSebelumnya(d)})` });
+            } else {
+              tasks.push(makeTask('Cuti Lainnya', d));
+            }
+          });
+
+          if (tasks.length === 0) {
+            setLoading(false); window.__APP__.isSubmitting = false;
+            const failMsg = failedAlready.map(r => `- ${r.jenis} (${r.tanggal}): ${r.message}`).join('\n');
+            return showMessage('Pengajuan ditolak karena duplikat sebelumnya:\n' + failMsg, false);
+          }
+
+          Promise.all(tasks)
+            .then(resultsFresh => {
+              const allResults = [...resultsFresh, ...failedAlready];
+              const failed     = allResults.filter(r => !r.success);
+              const succeeded  = allResults.filter(r =>  r.success);
+
+              if (failed.length === 0) {
+                showPopup();
+              } else {
+                showSuccessPopupWithDetails(succeeded, failed);
+              }
+
+              if (failed.length && !succeeded.length) {
+                const failMsg = failed.map(r => `- ${r.jenis} (${r.tanggal}): ${r.message || 'Gagal dikirim'}`).join('\n');
+                showMessage('Tidak ada pengajuan yang berhasil.\n' + failMsg, false);
+              }
+
+              refreshData();
+            })
+            .catch(err => {
+              showMessage('Gagal memproses pengajuan: ' + (err?.message || err), false);
+            })
+            .finally(() => {
+              setLoading(false);
+              window.__APP__.isSubmitting = false;   // reset guard
+            });
+        })
+        .getPengajuanUser(sessionToken);
+    }
+
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        refreshData();
+        
+        // --- SCRIPT BARU: LOGIKA UNTUK DROPDOWN USER ---
+        const dropdownToggle = document.getElementById('userDropdownToggle');
+        const dropdownMenu = document.getElementById('userDropdownMenu');
+
+        dropdownToggle.addEventListener('click', function(event) {
+            event.stopPropagation(); // Mencegah window.onclick langsung menutup menu
+            dropdownMenu.classList.toggle('show');
+        });
+
+        // Menutup dropdown jika pengguna mengklik di luar area menu
+        window.addEventListener('click', function(event) {
+            if (!dropdownToggle.contains(event.target)) {
+                if (dropdownMenu.classList.contains('show')) {
+                    dropdownMenu.classList.remove('show');
+                }
+            }
+        });
+        // --- AKHIR DARI SCRIPT DROPDOWN ---
+    });
+    document.getElementById('goToPengajuanUlang').addEventListener('click', ()=>navigateToPage('pengajuanUlang'));
+    // Ganti '#logoutButton' menjadi '#logoutLink'
+    document.getElementById('logoutLink').addEventListener('click', () => {
+      document.getElementById('popupLogout').style.display = 'flex';
+    });
+
+    function tutupPopupLogout() {
+      document.getElementById('popupLogout').style.display = 'none';
+    }
+    function prosesLogout() {
+      const popupLogout = document.getElementById('popupLogout');
+      const yesButton = popupLogout.querySelector('button[onclick="prosesLogout()"]');
+      
+      // Simpan konten asli
+      const originalContent = yesButton.innerHTML;
+
+      // Tampilkan loading spinner
+      yesButton.innerHTML = `<span class="material-icons-outlined loading-icon">autorenew</span> Keluar...`;
+      yesButton.disabled = true;
+
+      sessionStorage.removeItem('sessionToken');
+      google.script.run.logoutUser(sessionToken);
+
+      google.script.run
+        .withSuccessHandler(url => {
+          window.top.location.href = url;
+        })
+        .withFailureHandler(err => {
+          yesButton.innerHTML = originalContent;
+          yesButton.disabled = false;
+          alert('Logout gagal: ' + err.message);
+        })
+        .getScript();
+    }
+
+    function showPopup() {
+      document.getElementById('popup').style.display = 'flex';
+    }
+    function showInfoPopup(pesan) {
+      document.getElementById("popupInfoMessage").textContent = pesan;
+      document.getElementById("popupInfo").style.display = "flex";
+    }
+
+    function closeInfoPopup() {
+      document.getElementById("popupInfo").style.display = "none";
+    }
+
+    function closePopup() {
+        document.getElementById('popup').style.display = 'none';
+        resetForm();    // Panggil fungsi reset di sini!
+        refreshData();  // Refresh data setelah form bersih
+    }
+    function resetForm() {
+        // Kosongkan input jumlah hari
+        document.getElementById('jumlahLibur').value = '';
+        document.getElementById('jumlahCuti').value = '';
+        document.getElementById('jumlahCutiLain').value = '';
+
+        // Kosongkan kontainer tanggal
+        document.getElementById('tanggalLiburContainer').innerHTML = '';
+        document.getElementById('tanggalCutiContainer').innerHTML = '';
+        document.getElementById('tanggalCutiLainContainer').innerHTML = '';
+
+        // Sembunyikan pesan error/notice
+        document.getElementById('noticeLibur').style.display = 'none';
+        document.getElementById('noticeCuti').style.display = 'none';
+        document.getElementById('noticeCutiLain').style.display = 'none';
+        document.getElementById('pesan').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
