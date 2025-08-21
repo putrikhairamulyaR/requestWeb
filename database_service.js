@@ -31,9 +31,11 @@ class DatabaseService {
   // =================================================================
 
   async getNipFromToken(token) {
-    // Untuk sementara, kita akan menggunakan cache sederhana
-    // Dalam implementasi nyata, simpan token di database atau cache
-    return this.sessions.get(token) || null;
+    // Simple session lookup; fallback: if token looks like NIP (digits), use it
+    const fromSession = this.sessions.get(token);
+    if (fromSession) return fromSession;
+    if (typeof token === 'string' && /^\d{3,}$/.test(token)) return token;
+    return null;
   }
 
   generateToken() {
@@ -78,8 +80,8 @@ class DatabaseService {
         }
       }
 
-      // Generate token
-      const token = this.generateToken();
+      // Generate token (untuk dev: gunakan NIP sebagai token agar tahan restart)
+      const token = String(nip);
       this.sessions.set(token, nip);
 
       return {
@@ -106,6 +108,21 @@ class DatabaseService {
     }
   }
 
+  async getUserInfo(token) {
+    try {
+      const nip = await this.getNipFromToken(token);
+      if (!nip) return null;
+      const rows = await this.db.query(`SELECT nip, nama FROM useraccounts WHERE nip = ?`, [nip]);
+      if (rows.length > 0) {
+        return { nip: String(rows[0].nip), nama: rows[0].nama };
+      }
+      return { nip: String(nip), nama: '' };
+    } catch (error) {
+      console.error('Get user info error:', error);
+      return null;
+    }
+  }
+
   // =================================================================
   // FUNGSI UNTUK PENGGUNA
   // =================================================================
@@ -117,12 +134,12 @@ class DatabaseService {
         return { liburTersisa: 0, cutiTersisa: 0, cutiLainTersisa: 0 };
       }
 
-      // Hitung pengajuan yang sudah ada
+      // Hitung pengajuan yang sudah ada (case-insensitive)
       const sql = `
-        SELECT jenis_pengajuan, COUNT(*) as total
+        SELECT LOWER(jenis_pengajuan) AS jenis, COUNT(*) AS total
         FROM request 
         WHERE nip = ?
-        GROUP BY jenis_pengajuan
+        GROUP BY LOWER(jenis_pengajuan)
       `;
       
       const results = await this.db.query(sql, [nip]);
@@ -130,9 +147,10 @@ class DatabaseService {
       let totalLibur = 0, totalCuti = 0, totalCutiLain = 0;
       
       results.forEach(row => {
-        if (row.jenis_pengajuan === 'libur') totalLibur = row.total;
-        if (row.jenis_pengajuan === 'cuti') totalCuti = row.total;
-        if (row.jenis_pengajuan === 'cuti lainnya') totalCutiLain = row.total;
+        const jenis = (row.jenis || '').toString();
+        if (jenis === 'libur') totalLibur = row.total;
+        if (jenis === 'cuti') totalCuti = row.total;
+        if (jenis === 'cuti lainnya') totalCutiLain = row.total;
       });
 
       return {
@@ -239,7 +257,7 @@ class DatabaseService {
           ua.nama,
           r.jenis_pengajuan,
           r.status_pengajuan,
-          r.tanggal,
+          DATE_FORMAT(r.tanggal, '%Y-%m-%d') AS tanggal_str,
           r.timestamp
         FROM request r
         JOIN useraccounts ua ON r.nip = ua.nip
@@ -250,7 +268,7 @@ class DatabaseService {
       return pengajuan.map(p => ({
         nip: p.nip,
         nama: p.nama,
-        request: `${p.jenis_pengajuan}: ${p.tanggal.toLocaleDateString('id-ID')}`,
+        request: `${p.jenis_pengajuan}: ${p.tanggal_str}`,
         status: p.status_pengajuan
       }));
     } catch (error) {
@@ -265,7 +283,7 @@ class DatabaseService {
       if (!nip) return { libur: [], cuti: [], cutiLain: [] };
 
       const sql = `
-        SELECT jenis_pengajuan, tanggal
+        SELECT jenis_pengajuan, DATE_FORMAT(tanggal, '%Y-%m-%d') AS tanggal_str
         FROM request 
         WHERE nip = ?
         ORDER BY tanggal
@@ -278,12 +296,13 @@ class DatabaseService {
       const cutiLain = [];
 
       requests.forEach(req => {
-        const tanggal = req.tanggal.toISOString().split('T')[0];
-        if (req.jenis_pengajuan === 'libur') {
+        const tanggal = req.tanggal_str;
+        const jenis = (req.jenis_pengajuan || '').toString().toLowerCase().trim();
+        if (jenis === 'libur') {
           libur.push(tanggal);
-        } else if (req.jenis_pengajuan === 'cuti') {
+        } else if (jenis === 'cuti') {
           cuti.push(tanggal);
-        } else if (req.jenis_pengajuan === 'cuti lainnya') {
+        } else if (jenis === 'cuti lainnya') {
           cutiLain.push(tanggal);
         }
       });
@@ -442,7 +461,7 @@ class DatabaseService {
           ua.nama,
           r.jenis_pengajuan,
           r.status_pengajuan,
-          r.tanggal,
+          DATE_FORMAT(r.tanggal, '%Y-%m-%d') AS tanggal_str,
           r.timestamp
         FROM request r
         JOIN useraccounts ua ON r.nip = ua.nip
@@ -454,7 +473,7 @@ class DatabaseService {
       return requests.map(req => ({
         nip: req.nip,
         nama: req.nama,
-        request: `${req.jenis_pengajuan}: ${req.tanggal.toLocaleDateString('id-ID')}`,
+        request: `${req.jenis_pengajuan}: ${req.tanggal_str}`,
         status: req.status_pengajuan
       }));
     } catch (error) {
@@ -469,7 +488,7 @@ class DatabaseService {
 
     try {
       const sql = `
-        SELECT jenis_pengajuan, tanggal
+        SELECT jenis_pengajuan, DATE_FORMAT(tanggal, '%Y-%m-%d') AS tanggal_str
         FROM request 
         WHERE nip = ?
         ORDER BY tanggal
@@ -481,12 +500,13 @@ class DatabaseService {
       const cuti_lainnya = [];
 
       requests.forEach(req => {
-        const tanggal = req.tanggal.toISOString().split('T')[0];
-        if (req.jenis_pengajuan === 'libur') {
+        const tanggal = req.tanggal_str;
+        const jenis = (req.jenis_pengajuan || '').toString().toLowerCase().trim();
+        if (jenis === 'libur') {
           libur.push(tanggal);
-        } else if (req.jenis_pengajuan === 'cuti') {
+        } else if (jenis === 'cuti') {
           cuti.push(tanggal);
-        } else if (req.jenis_pengajuan === 'cuti lainnya') {
+        } else if (jenis === 'cuti lainnya') {
           cuti_lainnya.push(tanggal);
         }
       });

@@ -72,6 +72,17 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Get user info by token (debug/consistency)
+app.post('/api/user-info', async (req, res) => {
+  try {
+    const { token } = req.body;
+    const user = await dbService.getUserInfo(token);
+    res.json({ success: !!user, user });
+  } catch (e) {
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 // Logout
 app.post('/api/logout', async (req, res) => {
   try {

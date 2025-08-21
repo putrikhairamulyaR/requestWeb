@@ -376,7 +376,7 @@
      <div class="dropdown">
        <a id="userDropdownToggle" class="dropdown-toggle">
          <span class="material-icons-outlined">account_circle</span>
-         <span id="userNipDisplay"><?= nip ?></span> <span class="material-icons-outlined">arrow_drop_down</span>
+         <span id="userNipDisplay"></span> <span class="material-icons-outlined">arrow_drop_down</span>
        </a>
        <div id="userDropdownMenu" class="dropdown-menu">
          <a id="logoutLink">
@@ -431,6 +431,11 @@
     var flatpickrInstances = [];
     
     document.addEventListener('DOMContentLoaded', () => {
+        // Tampilkan NIP dari sessionStorage
+        const nipDisplay = document.getElementById('userNipDisplay');
+        const nip = sessionStorage.getItem('userNip');
+        if (nipDisplay) nipDisplay.textContent = nip || 'GUEST';
+
         refreshData();
         
         // --- SCRIPT BARU: LOGIKA UNTUK DROPDOWN USER ---
@@ -454,37 +459,22 @@
     });
 
 
-    function refreshData() {
-      Promise.all([
-        new Promise(r => google.script.run.withSuccessHandler(r).getPengajuanUntukUpdate(sessionToken)),
-        new Promise(r => google.script.run.withSuccessHandler(r).getTanggalDisableUser(sessionToken))
-      ]).then(([pj, dd]) => {
-        pengajuanData = pj || { libur: [], cuti: [] };
-        tanggalDisable = (dd || []).map(tglStr => {
-          const parsed = parseTanggal(tglStr);
-          return parsed ? parsed : tglStr;
-        });
-        renderInputs();
+    async function refreshData() {
+      const token = sessionStorage.getItem('sessionToken');
+      const [pjRes, ddRes] = await Promise.all([
+        fetch('/api/pengajuan-untuk-update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) }).then(r=>r.json()),
+        fetch('/api/get-disable-dates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) }).then(r=>r.json())
+      ]);
+      pengajuanData = pjRes?.pengajuan || { libur: [], cuti: [], cuti_lainnya: [] };
+      tanggalDisable = (ddRes?.disableDates || []).map(tglStr => {
+        const parsed = parseTanggal(tglStr);
+        return parsed ? parsed : tglStr;
       });
+      renderInputs();
     }
 
     function navigateToPage(page) {
-        const goBackBtn = document.getElementById('goBackButton');
-        const originalContent = goBackBtn.innerHTML;
-        goBackBtn.innerHTML = `<span class="material-icons-outlined loading-icon">autorenew</span> Memuat...`;
-        goBackBtn.style.pointerEvents = 'none';
-        goBackBtn.style.opacity = '0.6';
-        google.script.run
-          .withSuccessHandler(html => {
-            document.open(); document.write(html); document.close();
-          })
-          .withFailureHandler(err => {
-            goBackBtn.innerHTML = originalContent;
-            goBackBtn.style.pointerEvents = 'auto';
-            goBackBtn.style.opacity = '1';
-            showMessage('Gagal memuat halaman: ' + err.message, false);
-          })
-          .getPageContent(page, sessionToken);
+      window.location.href = '/' + page;
     }
     
     document.getElementById('goBackButton').addEventListener('click', () => navigateToPage('form'));
@@ -639,13 +629,14 @@
           btnSave.disabled = true;
           btnSave.innerHTML = `<span class="material-icons-outlined loading-icon">autorenew</span> Menyimpan...`;
           input.disabled = true;
-          const action = tanggalAwal ? 'updateSatuTanggal' : 'simpanSatuTanggal';
+          const endpoint = tanggalAwal ? '/api/update-satu-tanggal' : '/api/simpan-satu-tanggal';
           const payload = tanggalAwal ? 
-            { jenis, tanggalLama: tanggalAwal, tanggalBaru } : 
-            { jenis, tanggal: tanggalBaru };
+            { token: sessionStorage.getItem('sessionToken'), jenis, tanggalLama: tanggalAwal, tanggalBaru } : 
+            { token: sessionStorage.getItem('sessionToken'), jenis, tanggal: tanggalBaru };
           showStatusProses(true);
-          google.script.run
-            .withSuccessHandler(res => {
+          fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+            .then(r=>r.json())
+            .then(res => {
                 showMessage(res.message, res.success);
                 showStatusProses(false);
 
@@ -677,14 +668,13 @@
                     input.disabled = false;
                 }
             })
-            .withFailureHandler(err => {
-              showMessage('Terjadi kesalahan saat menyimpan: ' + err.message, false);
+            .catch(err => {
+              showMessage('Terjadi kesalahan saat menyimpan: ' + (err?.message || err), false);
               showStatusProses(false);
               btnSave.disabled = false;
               btnSave.textContent = 'Simpan';
               input.disabled = false;
-            })
-            [action](sessionToken, payload);
+            });
         };
 
         btnDelete.onclick = () => {
@@ -693,9 +683,12 @@
               btnDelete.innerHTML = `<span class="material-icons-outlined loading-icon">autorenew</span> Menghapus...`;
               input.disabled = true;
               showStatusProses(true);
-
-              google.script.run
-                  .withSuccessHandler(res => {
+              fetch('/api/hapus-satu-tanggal', {
+                  method: 'POST', headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ token: sessionStorage.getItem('sessionToken'), jenis, tanggal: tanggalAwal })
+              })
+                  .then(r=>r.json())
+                  .then(res => {
                       showMessage('Data berhasil dihapus.', true);
                       showStatusProses(false);
                       refreshData()
@@ -725,50 +718,22 @@
                           input.disabled = false;
                       }
                   })
-                  .withFailureHandler(err => {
-                      showMessage('Terjadi kesalahan saat menghapus: ' + err.message, false);
+                  .catch(err => {
+                      showMessage('Terjadi kesalahan saat menghapus: ' + (err?.message || err), false);
                       showStatusProses(false);
                       btnDelete.disabled = false;
                       btnDelete.textContent = 'Hapus';
                       input.disabled = false;
-                  })
-                  .hapusSatuTanggal(sessionToken, { jenis, tanggal: tanggalAwal });
+                  });
           });
 
         };
       }
-      document.getElementById('btnSubmitAll').style.display = 'none';
+      const btnSubmitAll = document.getElementById('btnSubmitAll');
+      if (btnSubmitAll) btnSubmitAll.style.display = 'none';
     }
 
-    document.getElementById('logoutButton').addEventListener('click', () => {
-        const logoutBtn = document.getElementById('logoutButton');
-        const originalContent = logoutBtn.innerHTML;
-        logoutBtn.innerHTML = `<span class="material-icons-outlined loading-icon">autorenew</span> Keluar...`;
-        logoutBtn.style.pointerEvents = 'none';
-        logoutBtn.style.opacity = '0.6';
-        google.script.run
-        .withSuccessHandler(() => {
-          sessionStorage.removeItem('sessionToken');
-          google.script.run
-            .withSuccessHandler(url => {
-              window.location.href = url;
-            })
-            .withFailureHandler(err => {
-              logoutBtn.innerHTML = originalContent;
-              logoutBtn.style.pointerEvents = 'auto';
-              logoutBtn.style.opacity = '1';
-              alert('Gagal mengarahkan ke halaman login: ' + err.message);
-            })
-            .getScriptUrl();
-        })
-        .withFailureHandler(err => {
-          logoutBtn.innerHTML = originalContent;
-          logoutBtn.style.pointerEvents = 'auto';
-          logoutBtn.style.opacity = '1';
-          alert('Logout gagal: ' + err.message);
-        })
-        .logoutUser(sessionToken);
-    });
+    // Hapus binding lama untuk element yang tidak ada (#logoutButton)
 
   function showStatusProses(show = true) {
     const statusBox = document.getElementById('statusProses');
@@ -786,19 +751,10 @@
       yesButton.innerHTML = `<span class="material-icons-outlined loading-icon">autorenew</span> Keluar...`;
       yesButton.disabled = true;
 
+      const token = sessionStorage.getItem('sessionToken');
       sessionStorage.removeItem('sessionToken');
-      google.script.run.logoutUser(sessionToken);
-
-      google.script.run
-        .withSuccessHandler(url => {
-          window.top.location.href = url;
-        })
-        .withFailureHandler(err => {
-          yesButton.innerHTML = originalContent;
-          yesButton.disabled = false;
-          alert('Logout gagal: ' + err.message);
-        })
-        .getScript();
+      fetch('/api/logout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) })
+        .finally(() => { window.location.href = '/'; });
     }
 
     function showPopup() {

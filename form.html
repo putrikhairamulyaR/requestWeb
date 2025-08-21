@@ -624,7 +624,7 @@
   <div class="dropdown">
     <a id="userDropdownToggle" class="dropdown-toggle">
       <span class="material-icons-outlined">account_circle</span>
-      <span id="userNipDisplay"><?= nip ?></span> <span class="material-icons-outlined">arrow_drop_down</span>
+      <span id="userNipDisplay"></span> <span class="material-icons-outlined">arrow_drop_down</span>
     </a>
     <div id="userDropdownMenu" class="dropdown-menu">
       <a id="logoutLink">
@@ -640,7 +640,7 @@
 
   <div class="content">
     <!-- Form Pengajuan DIPINDAH KE SINI -->
-    <h2 style="text-align:; color:#d80000; font-size:50px !important; margin-top: -20px !important; margin-left: 25 px;">Form Pengajuan</h2>
+    <h2 style="text-align:center; color:#d80000; font-size:50px !important; margin-top: -20px !important; margin-left: 25px;">Form Pengajuan</h2>
 
     <div class="form-container">
       <!-- LIBUR -->
@@ -670,7 +670,7 @@
     </div>
 
     <div id="riwayat-section">
-      <h2 style="text-align:center; color:#d80000; font-size:50px !important; margin-left: 30px !important margin-right: 30px !important;">Riwayat Pengajuan</h2>
+      <h2 style="text-align:center; color:#d80000; font-size:50px !important; margin-left: 30px !important; margin-right: 30px !important;">Riwayat Pengajuan</h2>
       <div class="riwayat-container">
         <div id="hasilLibur"></div>
         <div id="hasilCuti"></div>
@@ -710,24 +710,8 @@
     // --- FUNGSI BARU UNTUK MENAMPILKAN INFO USER (NIP/NIK) ---
     function displayUserInfo() {
       const nipDisplay = document.getElementById('userNipDisplay');
-      if (!sessionToken) {
-        nipDisplay.textContent = 'GUEST';
-        return;
-      }
-      // Panggil fungsi di server untuk mendapatkan info user berdasarkan token
-      google.script.run
-        .withSuccessHandler(userInfo => {
-          if (userInfo && userInfo.nip) {
-            nipDisplay.textContent = userInfo.nip;
-          } else {
-            nipDisplay.textContent = 'User';
-          }
-        })
-        .withFailureHandler(err => {
-          console.error("Gagal mengambil info user:", err);
-          nipDisplay.textContent = 'Error';
-        })
-        .getUserInfoByToken(sessionToken);
+      const nip = sessionStorage.getItem('userNip');
+      nipDisplay.textContent = nip ? nip : 'GUEST';
     }
 
     function showMessage(msg, success = true) {
@@ -750,11 +734,7 @@
     }
 
     function navigateToPage(page) {
-      document.body.innerHTML = '<h2 style="text-align:center; margin-top:50px;">Memuat halaman...</h2>';
-      google.script.run
-        .withSuccessHandler(html=>{document.open(); document.write(html); document.close(); })
-        .withFailureHandler(err=>showMessage(err.message,false))
-        .getPageContent(page, sessionToken);
+      window.location.href = `/${page}`;
     }
 
     function initFlatpickr(jatah, disableDatesLibur, tanggalMerah) {
@@ -935,36 +915,28 @@
 
     // GANTI FUNGSI refreshData LAMA ANDA DENGAN YANG INI DI FILE .html
 
-    function refreshData() {
+    async function refreshData() {
       showMessage('Memuat data...', true);
-
-      // Cukup satu panggilan ke fungsi baru kita
-      google.script.run
-        .withSuccessHandler(response => {
-          // Periksa apakah server merespons dengan sukses
-          if (response && response.success) {
-            // Ambil data dari dalam paket 'response.data'
-            const { jatah, disableDatesLibur, tanggalMerah, pengajuan } = response.data;
-            
-            // Panggil fungsi-fungsi UI seperti biasa
-            initFlatpickr(jatah, disableDatesLibur, tanggalMerah);
-            tampilkanRiwayatPengajuan(pengajuan);
-            
-            showMessage('Data berhasil diperbarui.', true);
-            setTimeout(() => document.getElementById('pesan').style.display = 'none', 2000);
-          } else {
-            // Tampilkan pesan error dari server jika ada
-            const errorMessage = response ? response.message : 'Struktur respons tidak dikenal.';
-            showMessage('Gagal memuat data: ' + errorMessage, false);
-            console.error('Server returned an error:', response);
-          }
-        })
-        .withFailureHandler(err => {
-          // Handler ini untuk error koneksi
-          showMessage('Gagal terhubung ke server: ' + err.message, false);
-          console.error('Connection error:', err);
-        })
-        .getInitial(sessionToken); // Panggil fungsi baru di server
+      try {
+        const token = sessionStorage.getItem('sessionToken');
+        const res = await fetch('/api/initial', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token })
+        });
+        const response = await res.json();
+        if (response && response.success) {
+          const { jatah, disableDatesLibur, tanggalMerah, pengajuan } = response.data;
+          initFlatpickr(jatah, disableDatesLibur, tanggalMerah);
+          tampilkanRiwayatPengajuan(pengajuan);
+          showMessage('Data berhasil diperbarui.', true);
+          setTimeout(() => document.getElementById('pesan').style.display = 'none', 1500);
+        } else {
+          showMessage('Gagal memuat data: ' + (response?.message || 'Unknown error'), false);
+        }
+      } catch (err) {
+        showMessage('Gagal terhubung ke server: ' + err.message, false);
+      }
     }
 
     function generateTable(title, dates) {
@@ -1084,45 +1056,54 @@
         return showMessage('Terdapat tanggal yang sama antar jenis pengajuan: ' + [...new Set(duplicatesAcross)].join(', '), false);
       }
 
-      google.script.run
-        .withFailureHandler(err => {
-          setLoading(false); window.__APP__.isSubmitting = false;
-          showMessage('Gagal ambil data lama: ' + err.message, false);
-        })
-        .withSuccessHandler(existing => {
-          const existingAll = [
-            ...(existing.libur || []),
-            ...(existing.cuti || []),
-            ...(existing.cutiLain || []),
-          ];
-          const existingSet = new Set(existingAll);
+      // Ambil pengajuan existing dulu agar bisa cek duplikat di UI
+      fetch('/api/pengajuan-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sessionStorage.getItem('sessionToken') })
+      })
+      .then(r => r.json())
+      .then(existingRes => {
+        const existing = existingRes.pengajuan || { libur: [], cuti: [], cutiLain: [] };
+        const existingAll = [
+          ...(existing.libur || []),
+          ...(existing.cuti || []),
+          ...(existing.cutiLain || []),
+        ];
+        const existingSet = new Set(existingAll);
 
-          const jenisMapping = {
-            'Libur': 'Libur',
-            'Cuti Tahunan': 'Cuti',
-            'Cuti Lainnya': 'Cuti Lainnya' // ganti ke 'Cuti CAP' kalau backend pakai itu
-          };
-          const toPayloadJenis = (label) => jenisMapping[label] || label;
+        const jenisMapping = {
+          'Libur': 'libur',
+          'Cuti Tahunan': 'cuti',
+          'Cuti Lainnya': 'cuti lainnya'
+        };
+        const toPayloadJenis = (label) => jenisMapping[label] || label;
 
-          const jenisSebelumnya = (date) => {
-            const j = [];
-            if ((existing.libur || []).includes(date)) j.push('Libur');
-            if ((existing.cuti || []).includes(date)) j.push('Cuti Tahunan');
-            if ((existing.cutiLain || []).includes(date)) j.push('Cuti Lainnya');
-            return j.join(', ');
-          };
+        const jenisSebelumnya = (date) => {
+          const j = [];
+          if ((existing.libur || []).includes(date)) j.push('Libur');
+          if ((existing.cuti || []).includes(date)) j.push('Cuti Tahunan');
+          if ((existing.cutiLain || []).includes(date)) j.push('Cuti Lainnya');
+          return j.join(', ');
+        };
 
-          const makeTask = (labelTampil, tanggal) => new Promise(resolve => {
-            google.script.run
-              .withSuccessHandler(res => {
-                const ok = res && (res.success === true || res === true);
-                resolve({ success: !!ok, message: (res && res.message) || '', jenis: labelTampil, tanggal });
-              })
-              .withFailureHandler(err => {
-                resolve({ success: false, message: err?.message || 'Gagal koneksi', jenis: labelTampil, tanggal });
-              })
-              .simpanPengajuan(sessionToken, { jenis: toPayloadJenis(labelTampil), tanggal: [tanggal] });
-          });
+        const makeTask = (labelTampil, tanggal) => new Promise(resolve => {
+          fetch('/api/simpan-pengajuan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              token: sessionStorage.getItem('sessionToken'),
+              jenis: toPayloadJenis(labelTampil),
+              tanggal: [tanggal]
+            })
+          })
+          .then(r => r.json())
+          .then(res => {
+            const ok = res && (res.success === true || res === true);
+            resolve({ success: !!ok, message: (res && res.message) || '', jenis: labelTampil, tanggal });
+          })
+          .catch(err => resolve({ success: false, message: err?.message || 'Gagal koneksi', jenis: labelTampil, tanggal }));
+        });
 
           const tasks = [];
           const failedAlready = [];
@@ -1183,13 +1164,13 @@
               setLoading(false);
               window.__APP__.isSubmitting = false;   // reset guard
             });
-        })
-        .getPengajuanUser(sessionToken);
+      });
     }
 
 
 
     document.addEventListener('DOMContentLoaded', () => {
+        displayUserInfo();
         refreshData();
         
         // --- SCRIPT BARU: LOGIKA UNTUK DROPDOWN USER ---
@@ -1231,19 +1212,10 @@
       yesButton.innerHTML = `<span class="material-icons-outlined loading-icon">autorenew</span> Keluar...`;
       yesButton.disabled = true;
 
+      const token = sessionStorage.getItem('sessionToken');
       sessionStorage.removeItem('sessionToken');
-      google.script.run.logoutUser(sessionToken);
-
-      google.script.run
-        .withSuccessHandler(url => {
-          window.top.location.href = url;
-        })
-        .withFailureHandler(err => {
-          yesButton.innerHTML = originalContent;
-          yesButton.disabled = false;
-          alert('Logout gagal: ' + err.message);
-        })
-        .getScript();
+      fetch('/api/logout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) })
+        .finally(() => { window.location.href = '/'; });
     }
 
     function showPopup() {
