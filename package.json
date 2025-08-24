@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["web-app", "mysql", "express", "cuti", "libur"],
-  "author": "",
+  "author": "putri",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",

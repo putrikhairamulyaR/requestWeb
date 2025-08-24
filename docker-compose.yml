@@ -1,18 +1,19 @@
+version: "3.9"
+
 services:
   db:
     image: mysql:8.0
     container_name: requestweb-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ROOT_PASSWORD: "@Ori2305"
       MYSQL_DATABASE: web
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
       - ./web.sql:/docker-entrypoint-initdb.d/1-init.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p@Ori2305"]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -23,12 +24,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    working_dir: /app
     environment:
       NODE_ENV: production
       PORT: 3000
       DB_HOST: db
       DB_USER: root
-      DB_PASSWORD: ""
+      DB_PASSWORD: "@Ori2305"
       DB_NAME: web
       DB_PORT: 3306
     ports:
@@ -37,5 +39,4 @@ services:
 
 volumes:
   db_data:
-
 
