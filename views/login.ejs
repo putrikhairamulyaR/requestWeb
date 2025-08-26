@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registrasi dan Login</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0; padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      max-width: 400px;
+      width: 90%; 
+      padding: 20px 25px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h2 { margin-bottom: 20px; color: #d80000; }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0 12px;
+      border: 1.8px solid #f5c6cb;
+      border-radius: 5px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 80%;
+      padding: 12px 0;
+      background: #d80000;
+      border: none;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 70px;
+      margin-top: 10px;
+    }
+    button:hover { background: #b30000; }
+    .message {
+      margin-top: 15px;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 6px;
+      display: none;
+    }
+    .message.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .message.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .password-container {
+      position: relative;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+    #togglePassword {
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #888;
+      font-size: 30px;
+    }
+
+/* -- TAMBAHAN BUAT HP LEBIH BESAR SEKALI -- */
+@media only screen and (max-width: 1080px) {
+  body {
+    height: 75%;
+    margin: 0;
+    padding: 0;
+    background: #f7f7f7;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* atau 100% tinggi viewport */
+  }
+
+  .container {
+    width: 100vw;  /* Lebar penuh viewport */
+    height: 300vh; /* Tinggi penuh viewport */
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 20px;
+    background: white;
+    border-radius: 0; /* Hilangkan border-radius supaya memenuhi layar */
+    box-shadow: none; /* Hilangkan box shadow supaya lebih rapi fullscreen */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  h2 {
+    font-size: 3.0rem; /* Tetap jaga ukuran teks */
+    margin-bottom: 30px;
+  }
+
+  input, select {
+    font-size: 2.4rem; /* Jauh lebih besar untuk input */
+    padding: 25px;
+    margin: 20px 0 30px;
+  }
+
+  button {
+    font-size: 2.5rem; /* Jauh lebih besar untuk tombol */
+    padding: 28px 0;
+    border-radius: 35px;
+  }
+
+  #togglePassword {
+    right: 25px; /* Penyesuaian posisi ikon */
+  }
+
+  .message {
+    font-size: 1.7rem;
+    padding: 20px;
+  }
+  #togglePassword {
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #888;
+      font-size: 50px;
+  }
+
+}
+
+/* -- AKHIR TAMBAHAN BUAT HP LEBIH BESAR SEKALI -- */
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="login-box">
+      <h2>Login dengan NIP/NIK</h2>
+
+      <form action="/auth/login" method="POST">
+        
+        <input type="text" id="login-nip" name="nip" placeholder="Masukkan NIP/NIK Anda" required />
+        
+        <div class="password-container">
+          <input type="password" id="password" name="password" placeholder="Masukkan Password Anda" required />
+          <i class="fas fa-eye-slash" id="togglePassword"></i>
+        </div>
+        
+        <button type="submit">Login</button>
+      </form>
+      
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="message error" style="display: block;">
+          <%= error %>
+        </div>
+      <% } %>
+      
+    </div>
+  </div>
+
+  <script>
+    // SATU-SATUNYA JAVASCRIPT YANG TERSISA HANYA UNTUK EFEK VISUAL (UI)
+    // Logika untuk menampilkan/menyembunyikan password
+    (function(){
+      const toggle = document.getElementById('togglePassword');
+      if (!toggle) return;
+      const pwdInput = document.getElementById('password');
+      toggle.addEventListener('click', () => {
+        const isPwd = pwdInput.getAttribute('type') === 'password';
+        pwdInput.setAttribute('type', isPwd ? 'text' : 'password');
+        toggle.classList.toggle('fa-eye');
+        toggle.classList.toggle('fa-eye-slash');
+      });
+    })();
+  </script>
+</body>
+</html>

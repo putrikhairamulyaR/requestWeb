@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Form Update Pengajuan</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f9f9f9; padding:20px; }
+    .container { max-width: 720px; margin:auto; background:#fff; padding:24px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.12); }
+    h2 { text-align:center; color:#d80000; margin-top:0; }
+    label { font-weight:bold; display:block; margin-top:14px; margin-bottom:8px; }
+    select, input[type="date"] {
+      width:100%; padding:12px 14px; border:1px solid #ccc; border-radius:10px; box-sizing:border-box; background:#fff;
+    }
+    .rows { margin-top:10px; }
+    .row {
+      display:flex; gap:14px; align-items:center; margin-bottom:12px;
+      background:#fafafa; padding:12px; border:1px solid #eee; border-radius:10px;
+    }
+    .row input[type="date"] { flex:1; }
+    .btn { padding:10px 16px; border:none; border-radius:10px; color:#fff; cursor:pointer; font-weight:bold; }
+    .btn-edit { background:#ffa000; }
+    .btn-delete { background:#d64141; }
+    .btn:disabled { opacity:.6; cursor:not-allowed; }
+    .empty { padding:14px; text-align:center; color:#666; background:#f6f6f6; border-radius:8px; border:1px dashed #ddd; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Form Update Pengajuan</h2>
+
+    <label for="jenis">Jenis Pengajuan</label>
+    <select id="jenis">
+      <option value="libur">Libur</option>
+      <option value="cuti">Cuti</option>
+      <option value="cutiLain">Cuti Lainnya</option>
+    </select>
+
+    <div id="tanggalList" class="rows"></div>
+  </div>
+
+  <!-- Suntik data dari backend secara AMAN -->
+  <script id="initial-data" type="application/json">
+    <%- JSON.stringify(data || { libur:[], cuti:[], cutiLain:[] }) %>
+  </script>
+
+  <script>
+    // Ambil & normalisasi data dari backend
+    let data;
+    try {
+      const raw = document.getElementById('initial-data').textContent || '{}';
+      const parsed = JSON.parse(raw);
+      data = {
+        libur: Array.isArray(parsed.libur) ? parsed.libur : [],
+        cuti: Array.isArray(parsed.cuti) ? parsed.cuti : [],
+        cutiLain: Array.isArray(parsed.cutiLain) ? parsed.cutiLain : []
+      };
+    } catch (e) {
+      console.error('Gagal parsing data dari server:', e);
+      data = { libur:[], cuti:[], cutiLain:[] };
+    }
+
+    const jenisSelect = document.getElementById('jenis');
+    const tanggalList = document.getElementById('tanggalList');
+
+    function renderTanggal() {
+      const jenis = jenisSelect.value;          // 'libur' | 'cuti' | 'cutiLain'
+      tanggalList.innerHTML = '';
+
+      const arr = data[jenis] || [];
+      if (!arr.length) {
+        tanggalList.innerHTML = '<div class="empty">Belum ada tanggal untuk jenis ini.</div>';
+        return;
+      }
+
+      arr.forEach((tgl, index) => {
+        const row = document.createElement('div');
+        row.className = 'row';
+
+        const input = document.createElement('input');
+        input.type = 'date';
+        input.value = tgl; // format backend sudah YYYY-MM-DD
+        input.onchange = (e) => {
+          data[jenis][index] = e.target.value;
+        };
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn btn-edit';
+        editBtn.textContent = 'Edit';
+        editBtn.onclick = async () => {
+          editBtn.disabled = true;
+          editBtn.textContent = 'Menyimpan...';
+          try {
+            const res = await fetch('/pengajuan-ulang', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'edit',
+                jenis,              // 'libur' | 'cuti' | 'cutiLain'
+                index,              // indeks elemen yang diedit
+                tanggal: data[jenis][index] // nilai terbaru dari input
+              })
+            });
+            const result = await res.json();
+            alert(result.message || 'Tanggal berhasil diupdate!');
+          } catch (err) {
+            console.error(err);
+            alert('Gagal update tanggal!');
+          } finally {
+            editBtn.disabled = false;
+            editBtn.textContent = 'Edit';
+          }
+        };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-delete';
+        deleteBtn.textContent = 'Hapus';
+        deleteBtn.onclick = async () => {
+          if (!confirm('Hapus tanggal ini?')) return;
+          deleteBtn.disabled = true;
+          deleteBtn.textContent = 'Menghapus...';
+          try {
+            const res = await fetch('/pengajuan-ulang', {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+              jenis,
+              index,
+              tanggal: data[jenis][index]
+              })
+            });
+            const result = await res.json();
+            alert(result.message || 'Tanggal berhasil dihapus!');
+            // Hapus di UI setelah server OK
+            data[jenis].splice(index, 1);
+            renderTanggal();
+          } catch (err) {
+            console.error(err);
+            alert('Gagal menghapus tanggal!');
+          }
+        };
+
+        row.appendChild(input);
+        row.appendChild(editBtn);
+        row.appendChild(deleteBtn);
+        tanggalList.appendChild(row);
+      });
+    }
+
+    // Event & render awal
+    jenisSelect.addEventListener('change', renderTanggal);
+    renderTanggal();
+  </script>
+</body>
+</html>

@@ -8,18 +8,26 @@
     "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["web-app", "mysql", "express", "cuti", "libur"],
+  "keywords": [
+    "web-app",
+    "mysql",
+    "express",
+    "cuti",
+    "libur"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
-    "mysql2": "^3.6.5",
     "bcrypt": "^5.1.1",
-    "uuid": "^9.0.1",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.10",
+    "express": "^4.18.2",
+    "express-session": "^1.18.2",
+    "mysql2": "^3.6.5",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
   }
-} 
+}

@@ -8,9 +8,10 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     ports:
       - "3306:3306"
+    restart: always
     volumes:
       - db_data:/var/lib/mysql
-      - ./web.sql:/docker-entrypoint-initdb.d/1-init.sql:ro
+      - ./web.sql:/docker-entrypoint-initdb.d/init.sql:z
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
