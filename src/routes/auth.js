@@ -8,7 +8,8 @@ router.post('/auth/login', userController.handleLogin);
 router.get('/form', userController.showFormPage);
 router.post('/form', userController.handleFormSubmission);
 router.get('/pengajuan-ulang', userController.showPengajuanUlangPage);
-router.post('/pengajuan-ulang', userController.showFormPage);
+router.put('/pengajuan-ulang', userController.handleUpdate);
+router.delete('/pengajuan-ulang', userController.handleDelete);
 
 // Rute untuk logout
 // router.get('/logout', authController.handleLogout);

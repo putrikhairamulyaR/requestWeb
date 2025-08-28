@@ -70,6 +70,66 @@ class Request {
       return []; // Kembalikan array kosong jika terjadi error
     }
   }
+
+  /**
+   * Mengupdate satu tanggal pengajuan.
+   * @param {string} nip - NIP pengguna.
+   * @param {string} jenis - Jenis pengajuan.
+   * @param {string} tanggalLama - Tanggal asli yang akan diubah (YYYY-MM-DD).
+   * @param {string} tanggalBaru - Tanggal baru (YYYY-MM-DD).
+   * @returns {Promise<object>} Hasil dari operasi query.
+   */
+  static async update(nip, jenis, tanggalLama, tanggalBaru) {
+    const sql = `
+      UPDATE request 
+      SET 
+        tanggal = ?, 
+        status_pengajuan = 'Update Pengajuan', 
+        timestamp = NOW()
+      WHERE 
+        nip = ? AND 
+        jenis_pengajuan = ? AND 
+        tanggal = ?
+    `;
+    const [result] = await pool.query(sql, [tanggalBaru, nip, jenis, tanggalLama]);
+    return result;
+  }
+
+  /**
+   * Menghapus satu tanggal pengajuan.
+   * @param {string} nip - NIP pengguna.
+   * @param {string} jenis - Jenis pengajuan.
+   * @param {string} tanggal - Tanggal yang akan dihapus (YYYY-MM-DD).
+   * @returns {Promise<object>} Hasil dari operasi query.
+   */
+  static async delete(nip, jenis, tanggal) {
+    const sql = `DELETE FROM request WHERE nip = ? AND jenis_pengajuan = ? AND tanggal = ?`;
+    const [result] = await pool.query(sql, [nip, jenis, tanggal]);
+    return result;
+  }
+
+  /**
+   * Menghitung total pengajuan 'libur' pada tanggal tertentu.
+   * @param {string} tanggal - Tanggal yang akan dicek (format YYYY-MM-DD).
+   * @returns {Promise<number>} Jumlah total pengajuan.
+   */
+  static async countLiburByDate(tanggal) {
+    const sql = `
+      SELECT COUNT(*) as total 
+      FROM request 
+      WHERE jenis_pengajuan = 'libur' AND tanggal = ?
+    `;
+    
+    try {
+      const [rows] = await pool.query(sql, [tanggal]);
+      // Mengembalikan nilai 'total' dari baris pertama, atau 0 jika tidak ada hasil
+      return rows[0].total || 0; 
+    } catch (error) {
+      console.error("Error di countByDate:", error);
+      throw new Error("Gagal menghitung kuota tanggal.");
+    }
+  }
 }
+
 
 module.exports = Request;

@@ -134,9 +134,79 @@ async function processPengajuan(token, formData) {
   return results;
 }
 
+async function updateTanggal(token, jenis, tanggalLama, tanggalBaru) {
+  // 1. Verifikasi sesi pengguna
+  const user = await authService.getUserByToken(token);
+  if (!user) {
+    throw new Error("Sesi tidak valid atau telah berakhir.");
+  }
+
+  // 2. Validasi input dasar
+  if (!jenis || !tanggalLama || !tanggalBaru) {
+    throw new Error("Data tidak lengkap untuk melakukan update.");
+  }
+  if (tanggalLama === tanggalBaru) {
+    throw new Error("Tidak ada perubahan pada tanggal.");
+  }
+
+  // 3. Validasi aturan bisnis
+  // Cek apakah tanggal baru sudah pernah diajukan sebelumnya
+  const existingRequests = await Request.findByUser(user.nip);
+  const allExistingDates = [
+    ...(existingRequests.libur || []),
+    ...(existingRequests.cuti || []),
+    ...(existingRequests.cuti_lainnya || [])
+  ];
+  if (allExistingDates.includes(tanggalBaru)) {
+    throw new Error(`Tanggal ${tanggalBaru} sudah pernah Anda ajukan.`);
+  }
+
+  // Cek kuota harian jika jenisnya 'libur'
+  if (jenis.toLowerCase() === 'libur') {
+    const dailyCount = await Request.countLiburByDate(tanggalBaru);
+    if (dailyCount >= CONFIG.QUOTA.HARIAN) {
+      throw new Error(`Kuota untuk tanggal ${tanggalBaru} sudah penuh.`);
+    }
+  }
+
+  // 4. Panggil model untuk melakukan update di database
+  const result = await Request.update(user.nip, jenis, tanggalLama, tanggalBaru);
+
+  // 5. Periksa apakah ada baris yang benar-benar diupdate
+  if (result.affectedRows === 0) {
+    throw new Error("Data pengajuan yang akan diupdate tidak ditemukan di database.");
+  }
+
+  return { success: true, message: `Pengajuan berhasil diupdate ke tanggal ${tanggalBaru}` };
+}
+
+/**
+ * Logika bisnis untuk menghapus satu tanggal pengajuan.
+ */
+async function hapusTanggal(token, jenis, tanggal) {
+  const user = await authService.getUserByToken(token);
+  if (!user) {
+    throw new Error("Sesi tidak valid.");
+  }
+
+  if (!jenis || !tanggal) {
+    throw new Error("Data tidak lengkap untuk menghapus.");
+  }
+
+  const result = await Request.delete(user.nip, jenis, tanggal);
+
+  if (result.affectedRows === 0) {
+    throw new Error("Data pengajuan yang akan dihapus tidak ditemukan.");
+  }
+
+  return { success: true, message: `Pengajuan tanggal ${tanggal} berhasil dihapus.` };
+}
 
 
 module.exports = {
   getInitialData,
-  processPengajuan
+  processPengajuan,
+  updateTanggal,
+  hapusTanggal
+  
 };

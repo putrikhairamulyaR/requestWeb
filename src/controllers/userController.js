@@ -169,6 +169,54 @@ async function handleFormSubmission(req, res) {
   }
 }
 
+// Contoh di /src/controllers/pengajuanUlangController.js
+
+
+
+async function handleUpdate(req, res) {
+    try {
+    // Ambil data dari body request
+    const { jenis, oldDate, newDate } = req.body;
+    
+    // Ambil token dari sesi
+    const token = req.session.token; 
+    if (!token) {
+        // Kirim error jika tidak ada sesi
+        return res.status(401).json({ success: false, message: 'Unauthorized: Silakan login kembali.' });
+    }
+
+    // Panggil service untuk melakukan pekerjaan
+    const result = await formService.updateTanggal(token, jenis, oldDate, newDate);
+    
+    // Jika service berhasil, kirim respons JSON yang sukses
+    res.status(200).json(result);
+
+  } catch (error) {
+    // Jika terjadi error di mana pun di dalam blok 'try', 
+    // server TIDAK AKAN CRASH. Sebaliknya, blok ini akan dijalankan.
+    console.error('Error di handleUpdate:', error); // Log error di server
+    
+    // Kirim respons JSON yang berisi pesan error
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Terjadi kesalahan pada server saat mengupdate data.' 
+    });
+  }
+}
+
+
+async function handleDelete(req, res) {
+    try {
+        const { jenis, tanggal } = req.body;
+        const token = req.session.token;
+
+        const result = await formService.hapusTanggal(token, jenis, tanggal);
+        res.status(200).json(result);
+
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+}
 
 
 module.exports = {
@@ -176,6 +224,8 @@ module.exports = {
   handleLogin,
   handleFormSubmission,
   showFormPage,
-  showPengajuanUlangPage
+  showPengajuanUlangPage,
+  handleUpdate,
+  handleDelete
 
 };

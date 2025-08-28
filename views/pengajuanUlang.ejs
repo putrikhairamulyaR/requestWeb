@@ -71,7 +71,8 @@
         tanggalList.innerHTML = '<div class="empty">Belum ada tanggal untuk jenis ini.</div>';
         return;
       }
-
+      let oldDate;
+      let newDate;
       arr.forEach((tgl, index) => {
         const row = document.createElement('div');
         row.className = 'row';
@@ -79,8 +80,11 @@
         const input = document.createElement('input');
         input.type = 'date';
         input.value = tgl; // format backend sudah YYYY-MM-DD
+        oldDate=data[jenis][index];
+        newDate=data[jenis][index];
         input.onchange = (e) => {
-          data[jenis][index] = e.target.value;
+          
+          newDate = e.target.value;
         };
 
         const editBtn = document.createElement('button');
@@ -88,16 +92,17 @@
         editBtn.textContent = 'Edit';
         editBtn.onclick = async () => {
           editBtn.disabled = true;
+          console.log()
           editBtn.textContent = 'Menyimpan...';
           try {
             const res = await fetch('/pengajuan-ulang', {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                action: 'edit',
-                jenis,              // 'libur' | 'cuti' | 'cutiLain'
-                index,              // indeks elemen yang diedit
-                tanggal: data[jenis][index] // nilai terbaru dari input
+                jenis:jenis,
+                oldDate:oldDate,              // 'libur' | 'cuti' | 'cutiLain'
+                newDate:newDate              // indeks elemen yang diedit
+                 // nilai terbaru dari input
               })
             });
             const result = await res.json();
@@ -123,9 +128,9 @@
               method: 'DELETE',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-              jenis,
-              index,
-              tanggal: data[jenis][index]
+              jenis:jenis,
+              tanggal:data[jenis][index]
+              
               })
             });
             const result = await res.json();
