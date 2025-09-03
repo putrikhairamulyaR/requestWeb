@@ -4,8 +4,8 @@ services:
     container_name: requestweb-mysql
     environment:
       MYSQL_ROOT_PASSWORD: ""
-      MYSQL_DATABASE: web
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 
     ports:
       - "3306:3306"
     restart: always
