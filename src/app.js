@@ -4,7 +4,7 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const session = require('express-session');
+const session = require('cookie-session');
 
 
 const authRoutes = require('./routes/auth');

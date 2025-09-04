@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3000;
 
 /**
  * Fungsi untuk memulai server.
- * Pertama, ia akan mencoba terhubung ke database.
+ * Pertama, ia akan mencoba terhubung ke database. 
  * Jika berhasil, baru ia akan menjalankan server Express.
  */
 async function startServer() {
