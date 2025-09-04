@@ -1,33 +1,43 @@
-// Mengimpor model yang berinteraksi langsung dengan database
 const User = require('../models/userModel');
-// Anda akan membutuhkan pustaka untuk token dan password hashing di sini
-// const jwt = require('jsonwebtoken');
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 
+const jwt = require('jsonwebtoken'); // <-- Impor JWT
+
+/**
+ * Memverifikasi kredensial pengguna dan mengembalikan JWT jika valid.
+ */
 async function loginUser(nip, password) {
   // 1. Panggil model untuk mendapatkan data dari DB
   const user = await User.findByNip(nip);
-  
   if (!user) {
-    throw new Error("NIP/NIK tidak terdaftar.");
+    throw new Error("NIP/NIK atau Password salah."); // Pesan dibuat lebih umum untuk keamanan
   }
 
-  // 2. Logika bisnis untuk memvalidasi password
-  // SANGAT PENTING: Ganti ini dengan bcrypt.compare()
-  const isPasswordMatch = (user.password === password); 
-  if (!isPasswordMatch) {
-    throw new Error("Password salah.");
-  }
+  
+  const isPasswordValid = await bcrypt.compare(password, user.password); 
+  if (!isPasswordValid) {
+     throw new Error("NIP/NIK atau Password salah.");
+   }
+  // --- Logika plain text sementara (HARUS DIGANTI) ---
+  
 
-  // 3. Logika bisnis untuk membuat token sesi/JWT
-  // Ganti ini dengan token yang aman dan acak (misalnya JWT)
-  const token = String(user.nip); 
-  // Logika untuk menyimpan sesi juga akan ada di sini
+  // 3. Buat payload untuk token
+  const payload = {
+    nip: user.nip,
+    nama: user.nama
+  };
 
-  // 4. Kembalikan data yang sudah diproses
+  // 4. Buat (tandatangani) JWT
+  const token = jwt.sign(
+    payload, 
+    process.env.JWT_SECRET, // Gunakan kunci rahasia dari .env
+    { expiresIn: '10m' } // Token akan kedaluwarsa dalam 10 menit
+  );
+
+  // 5. Kembalikan data yang dibutuhkan
   return {
     success: true,
-    token: token,
+    token: token, // Token sekarang adalah string acak yang aman
     user: {
       nip: user.nip,
       nama: user.nama
@@ -35,21 +45,27 @@ async function loginUser(nip, password) {
   };
 }
 
-async function getUserByToken(token) {
-  // Karena token = nip, kita cukup cari user by nip
-  const user = await User.findByNip(token);
-
-  if (!user) {
-    throw new Error("Token tidak valid atau user tidak ditemukan.");
+/**
+ * Memverifikasi sebuah JWT dan mengembalikan payload jika valid.
+ * @param {string} token - JWT dari klien.
+ * @returns {object|null} Payload pengguna jika token valid, atau null jika tidak.
+ */
+function verifyUserToken(token) {
+  if (!token) {
+    return null;
   }
-
-  return {
-    nip: user.nip,
-    nama: user.nama
-  };
+  try {
+    // Coba verifikasi token menggunakan kunci rahasia
+    const decodedPayload = jwt.verify(token, process.env.JWT_SECRET);
+    return decodedPayload; // Mengembalikan { nip, nama, iat, exp }
+  } catch (error) {
+    // Jika token tidak valid (kadaluwarsa, tanda tangan salah, dll.)
+    console.error("Verifikasi token gagal:", error.message);
+    return null;
+  }
 }
 
 module.exports = {
   loginUser,
-  getUserByToken
+  verifyUserToken // Kita ganti nama fungsinya agar lebih jelas
 };

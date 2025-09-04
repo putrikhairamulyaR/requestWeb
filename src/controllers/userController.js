@@ -112,7 +112,7 @@ async function showPengajuanUlangPage(req, res) {
 /**
  * Controller untuk memproses data dari form pengajuan (POST /form/ajukan)
  */
-async function handleFormSubmission(req, res) {
+async function handleInsert(req, res) {
   let pageData; // data untuk halaman
 
   try {
@@ -222,7 +222,7 @@ async function handleDelete(req, res) {
 module.exports = {
   showLoginPage,
   handleLogin,
-  handleFormSubmission,
+  handleInsert,
   showFormPage,
   showPengajuanUlangPage,
   handleUpdate,

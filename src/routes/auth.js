@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
+const protectRoute = require('../middleware/authMiddleware');
 
-// Rute GET untuk menampilkan halaman login EJS
+
 router.get('/auth/login', userController.showLoginPage);
 router.post('/auth/login', userController.handleLogin);
-router.get('/form', userController.showFormPage);
-router.post('/form', userController.handleFormSubmission);
-router.get('/pengajuan-ulang', userController.showPengajuanUlangPage);
-router.put('/pengajuan-ulang', userController.handleUpdate);
-router.delete('/pengajuan-ulang', userController.handleDelete);
+router.get('/form',protectRoute ,userController.showFormPage);
+router.post('/form', protectRoute,userController.handleInsert);
+router.get('/pengajuan-ulang',protectRoute ,userController.showPengajuanUlangPage);
+router.put('/pengajuan-ulang',protectRoute ,userController.handleUpdate);
+router.delete('/pengajuan-ulang', protectRoute,userController.handleDelete);
 
 // Rute untuk logout
 // router.get('/logout', authController.handleLogout);

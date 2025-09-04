@@ -8,7 +8,7 @@ const { pool } = require('../config/database');
  * Mengambil semua data yang dibutuhkan untuk me-render halaman form.
  */
 async function getInitialData(token) {
-  const user = await authService.getUserByToken(token);
+  const user = await authService.verifyUserToken(token);
   if (!user) {
     throw new Error("Sesi tidak valid. Silakan login kembali.");
   }
@@ -57,7 +57,7 @@ async function getInitialData(token) {
 
 
 async function processPengajuan(token, formData) {
-  const user = await authService.getUserByToken(token);
+  const user = await authService.verifyUserToken(token);
   if (!user) throw new Error("Sesi tidak valid.");
 
   const connection = await pool.getConnection();
@@ -136,7 +136,7 @@ async function processPengajuan(token, formData) {
 
 async function updateTanggal(token, jenis, tanggalLama, tanggalBaru) {
   // 1. Verifikasi sesi pengguna
-  const user = await authService.getUserByToken(token);
+  const user = await authService.verifyUserToken(token);
   if (!user) {
     throw new Error("Sesi tidak valid atau telah berakhir.");
   }
@@ -184,7 +184,7 @@ async function updateTanggal(token, jenis, tanggalLama, tanggalBaru) {
  * Logika bisnis untuk menghapus satu tanggal pengajuan.
  */
 async function hapusTanggal(token, jenis, tanggal) {
-  const user = await authService.getUserByToken(token);
+  const user = await authService.verifyUserToken(token);
   if (!user) {
     throw new Error("Sesi tidak valid.");
   }

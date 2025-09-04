@@ -8,8 +8,8 @@ WORKDIR /app
 # Only copy package files first to leverage Docker layer cache
 COPY package*.json ./
 
-# Install production deps only
-RUN npm ci --omit=dev
+
+RUN npm install
 
 # --- Runtime image ---
 FROM node:20-alpine AS runtime
