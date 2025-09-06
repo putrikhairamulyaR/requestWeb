@@ -46,6 +46,11 @@ async function getInitialData(token) {
     if (jenis === 'cuti lainnya') pengajuan.cutiLain.push(req.tanggal_str);
   });
 
+  // Remove duplicates from each array
+  pengajuan.libur = [...new Set(pengajuan.libur)];
+  pengajuan.cuti = [...new Set(pengajuan.cuti)];
+  pengajuan.cutiLain = [...new Set(pengajuan.cutiLain)];
+
   const disableDatesLibur = [...new Set([...disabledLiburDates, ...allHolidays])];
 
   return { jatah, pengajuan, tanggalMerah: allHolidays, disableDatesLibur };
@@ -107,6 +112,16 @@ async function processPengajuan(token, formData) {
             continue;
           }
 
+          // 🔹 Cek duplikat tanggal untuk user yang sama (semua jenis)
+          const [duplicateRows] = await connection.query(
+            "SELECT COUNT(*) as jumlah FROM request WHERE nip = ? AND tanggal = ?",
+            [user.nip, tanggal]
+          );
+          if (duplicateRows[0].jumlah > 0) {
+            results.failed.push({ jenis, tanggal, reason: "Tanggal yang dimasukkan sudah ada" });
+            continue;
+          }
+
           // 🔹 Cek kuota global (misalnya libur max 5 orang per tanggal)
           if (jenis === "libur") {
             const [rows] = await connection.query(
@@ -150,15 +165,24 @@ async function updateTanggal(token, jenis, tanggalLama, tanggalBaru) {
   }
 
   // 3. Validasi aturan bisnis
-  // Cek apakah tanggal baru sudah pernah diajukan sebelumnya
+  // Cek apakah tanggal baru sudah pernah diajukan sebelumnya (kecuali tanggal lama yang sedang diedit)
   const existingRequests = await Request.findByUser(user.nip);
   const allExistingDates = [
     ...(existingRequests.libur || []),
     ...(existingRequests.cuti || []),
     ...(existingRequests.cuti_lainnya || [])
   ];
-  if (allExistingDates.includes(tanggalBaru)) {
+  
+  // Filter out tanggal lama yang sedang diedit
+  const otherExistingDates = allExistingDates.filter(date => date !== tanggalLama);
+  if (otherExistingDates.includes(tanggalBaru)) {
     throw new Error(`Tanggal ${tanggalBaru} sudah pernah Anda ajukan.`);
+  }
+
+  // Cek apakah tanggal baru adalah tanggal merah
+  const allHolidays = await Request.getAllHolidays();
+  if (allHolidays.includes(tanggalBaru)) {
+    throw new Error(`Tanggal ${tanggalBaru} adalah hari libur nasional.`);
   }
 
   // Cek kuota harian jika jenisnya 'libur'
@@ -177,7 +201,51 @@ async function updateTanggal(token, jenis, tanggalLama, tanggalBaru) {
     throw new Error("Data pengajuan yang akan diupdate tidak ditemukan di database.");
   }
 
+  // 6. Clean up any potential duplicates after update
+  await cleanupDuplicates(user.nip, jenis);
+
   return { success: true, message: `Pengajuan berhasil diupdate ke tanggal ${tanggalBaru}` };
+}
+
+/**
+ * Membersihkan duplikasi data pengajuan untuk user tertentu
+ */
+async function cleanupDuplicates(nip, jenis) {
+  try {
+    const { pool } = require('../config/database');
+    
+    // Get all requests for this user and jenis
+    const [requests] = await pool.query(
+      'SELECT tanggal FROM request WHERE nip = ? AND jenis_pengajuan = ? ORDER BY timestamp',
+      [nip, jenis]
+    );
+    
+    // Group by tanggal and keep only the latest one
+    const dateGroups = {};
+    requests.forEach(req => {
+      if (!dateGroups[req.tanggal]) {
+        dateGroups[req.tanggal] = [];
+      }
+      dateGroups[req.tanggal].push(req);
+    });
+    
+    // Delete duplicates, keeping only the latest one
+    for (const [tanggal, reqs] of Object.entries(dateGroups)) {
+      if (reqs.length > 1) {
+        // Keep the latest one, delete the rest
+        const toDelete = reqs.slice(0, -1); // All except the last one
+        for (const req of toDelete) {
+          await pool.query(
+            'DELETE FROM request WHERE nip = ? AND jenis_pengajuan = ? AND tanggal = ? AND timestamp = ?',
+            [nip, jenis, req.tanggal, req.timestamp]
+          );
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error cleaning up duplicates:', error);
+    // Don't throw error, just log it
+  }
 }
 
 /**
@@ -198,6 +266,9 @@ async function hapusTanggal(token, jenis, tanggal) {
   if (result.affectedRows === 0) {
     throw new Error("Data pengajuan yang akan dihapus tidak ditemukan.");
   }
+
+  // Clean up any potential duplicates after delete
+  await cleanupDuplicates(user.nip, jenis);
 
   return { success: true, message: `Pengajuan tanggal ${tanggal} berhasil dihapus.` };
 }
