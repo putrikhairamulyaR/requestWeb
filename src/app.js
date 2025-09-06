@@ -23,7 +23,10 @@ app.set('views', path.join(__dirname, "..", "views"));
 // =================================================================
 // MIDDLEWARE
 // =================================================================
-app.use(cors());
+app.use(cors({
+  origin: true, // Allow all origins in development
+  credentials: true // Allow cookies to be sent
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
@@ -32,7 +35,11 @@ app.use(session({
     secret: "1234", // sebaiknya pakai process.env.SESSION_SECRET
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }
+    cookie: { 
+        secure: false, // Set to true if using HTTPS
+        httpOnly: false, // Allow JavaScript access for debugging
+        sameSite: 'lax' // Allow cross-site requests
+    }
 }));
 
 // =================================================================
