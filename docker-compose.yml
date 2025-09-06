@@ -3,9 +3,8 @@ services:
     image: mysql:8.0
     container_name: requestweb-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ""
-      MYSQL_DATABASE:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD} # Mengambil dari file .env
+      MYSQL_DATABASE: ${DB_NAME}           # Mengambil dari file .env
     ports:
       - "3306:3306"
     restart: always
@@ -17,6 +16,11 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+  
+  redis: # <-- SERVICE BARU
+    image: redis:alpine # Gunakan image yang ringan
+    container_name: requestweb-redis
+    restart: always
 
   web:
     build: .
@@ -24,20 +28,21 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis: # <-- Tambahkan dependensi ke Redis
+        condition: service_started # Cukup 'started' untuk Redis
     environment:
       NODE_ENV: production
       PORT: 3000
-      DB_HOST: 
-      DB_USER: 
-      DB_PASSWORD: 
-      DB_NAME: 
+      DB_HOST: 'db' # <--- PERBAIKAN KRITIS
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
       DB_PORT: 3306
-      JWT_SECRET: hfkwlbisflwifai
+      JWT_SECRET: ${JWT_SECRET}
+      REDIS_HOST: "redis"
     ports:
       - "3000:3000"
     restart: unless-stopped
 
 volumes:
   db_data:
-
-

@@ -19,7 +19,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^6.0.0",
+
+    "bcrypt": "^5.1.1",
+    "connect-redis": "^9.0.0",
+    "cookie-session": "^2.1.1",
+
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.10",
@@ -27,6 +31,7 @@
     "express-session": "^1.18.2",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.6.5",
+    "redis": "^5.8.2",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
