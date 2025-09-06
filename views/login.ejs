@@ -82,70 +82,51 @@
 /* -- TAMBAHAN BUAT HP LEBIH BESAR SEKALI -- */
 @media only screen and (max-width: 1080px) {
   body {
-    height: 75%;
+    height: 100vh;
     margin: 0;
     padding: 0;
     background: #f7f7f7;
-  }
-
-  body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* atau 100% tinggi viewport */
   }
 
   .container {
-    width: 100vw;  /* Lebar penuh viewport */
-    height: 300vh; /* Tinggi penuh viewport */
-    max-width: none;
-    max-height: none;
-    margin: 0;
+    width: 90%;
+    max-width: 400px;
     padding: 20px;
     background: white;
-    border-radius: 0; /* Hilangkan border-radius supaya memenuhi layar */
-    box-shadow: none; /* Hilangkan box shadow supaya lebih rapi fullscreen */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
   }
 
   h2 {
-    font-size: 3.0rem; /* Tetap jaga ukuran teks */
-    margin-bottom: 30px;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
   }
 
   input, select {
-    font-size: 2.4rem; /* Jauh lebih besar untuk input */
-    padding: 25px;
-    margin: 20px 0 30px;
+    font-size: 1.1rem;
+    padding: 12px;
+    margin: 8px 0 12px;
   }
 
   button {
-    font-size: 2.5rem; /* Jauh lebih besar untuk tombol */
-    padding: 28px 0;
-    border-radius: 35px;
+    font-size: 1.2rem;
+    padding: 12px 0;
+    border-radius: 70px;
   }
 
   #togglePassword {
-    right: 25px; /* Penyesuaian posisi ikon */
+    right: 15px;
+    font-size: 20px;
   }
 
   .message {
-    font-size: 1.7rem;
-    padding: 20px;
+    font-size: 1rem;
+    padding: 10px;
   }
-  #togglePassword {
-      position: absolute;
-      top: 50%;
-      right: 15px;
-      transform: translateY(-50%);
-      cursor: pointer;
-      color: #888;
-      font-size: 50px;
-  }
-
 }
 
 /* -- AKHIR TAMBAHAN BUAT HP LEBIH BESAR SEKALI -- */
