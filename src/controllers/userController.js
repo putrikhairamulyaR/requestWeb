@@ -26,8 +26,7 @@ async function handleLogin(req, res) {
     
     // PENTING: Jika login sukses, buat sesi dan redirect
     if (result.success) {
-      // Simpan informasi penting di sesi
-      // (Ini contoh jika Anda menggunakan express-session)
+      
       req.session.token = result.token;
       req.session.user = result.user;
 
