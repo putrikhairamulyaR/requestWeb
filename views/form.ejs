@@ -871,7 +871,7 @@
         <h3>Pengajuan Libur</h3>
         <label id="labelLibur">Sisa request Libur: <%= data.jatah.liburTersisa %></label>
         <% if (data.jatah.liburTersisa > 0) { %>
-           <input type="number" id="jumlahLibur" name="jumlahLibur" min="0" max=<%= data.jatah.liburTersisa %> />
+           <input type="number" id="jumlahLibur" name="jumlahLibur" min="0" max=<%= data.jatah.liburTersisa %> placeholder="Jumlah libur tahunan" />
            <div id="tanggalLiburContainer" data-libur-tersisa="<%= data.jatah.liburTersisa %>"></div>
 
         <% } else { %>
