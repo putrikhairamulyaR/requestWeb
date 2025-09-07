@@ -983,7 +983,7 @@
   
 
   <script>
-    function renderTanggalInput(jumlah, containerId,disableDate) {
+    function renderTanggalInputLibur(jumlah, containerId,disableDate) {
       const container = document.getElementById(containerId);
       container.innerHTML = "";
       for (let i = 1; i <= jumlah; i++) {
@@ -997,6 +997,24 @@
           dateFormat: "Y-m-d",
           minDate: "today",
           disable: disableDate
+        });
+      }
+    }
+
+    function renderTanggalInputCuti(jumlah, containerId,disableDate) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      for (let i = 1; i <= jumlah; i++) {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.name = `${containerId}_tanggal${i}`;
+        input.placeholder = `Pilih Tanggal ${i}`;
+        container.appendChild(input);
+
+        flatpickr(input, {
+          dateFormat: "Y-m-d",
+          minDate: "today"
+          
         });
       }
     }
@@ -1029,14 +1047,14 @@
    
   
     document.getElementById("jumlahLibur").addEventListener("input", e => {
-      renderTanggalInput(e.target.value, "tanggalLiburContainer",disableDatesLibur);
+      renderTanggalInputLibur(e.target.value, "tanggalLiburContainer",disableDatesLibur);
     });
 
     document.getElementById("jumlahCuti").addEventListener("input", e => {
-      renderTanggalInput(e.target.value, "tanggalCutiContainer",disableDatesLibur);
+      renderTanggalInputCuti(e.target.value, "tanggalCutiContainer",disableDatesLibur);
     });
     document.getElementById("jumlahCutiLain").addEventListener("input", e => {
-      renderTanggalInput(e.target.value, "tanggalCutiLainContainer",disableDatesLibur);
+      renderTanggalInputCuti(e.target.value, "tanggalCutiLainContainer",disableDatesLibur);
     });
 
     // Dropdown functionality
