@@ -1,21 +1,16 @@
 // Muat environment variables terlebih dahulu
 require('dotenv').config();
 
-const { pool } = require('./src/config/database');
+const { pool } = require('./setupDatabase');
 const bcrypt = require('bcrypt');
 
-const SALT_ROUNDS = 10; // Standar industri, jangan diubah kecuali Anda tahu alasannya
+const SALT_ROUNDS = 10;
 
 async function migratePasswords() {
-    let connection;
+    console.log('Memulai proses migrasi password...');
+   
     try {
-        console.log('Memulai proses migrasi password...');
-        
-        connection = await pool.getConnection();
-
-        // 1. Ambil semua user yang passwordnya BUKAN hash bcrypt
-        //    Hash bcrypt selalu diawali dengan '$2a$', '$2b$', atau '$2y$'.
-        const [usersToMigrate] = await connection.query(
+        const [usersToMigrate] = await pool.query(
             "SELECT nip, password FROM useraccounts WHERE password NOT LIKE '$2b$%' AND password IS NOT NULL AND password != ''"
         );
 
@@ -26,35 +21,28 @@ async function migratePasswords() {
 
         console.log(`Menemukan ${usersToMigrate.length} password plain text yang akan di-hash...`);
 
-        // 2. Loop setiap user, hash passwordnya, dan update ke database
         for (const user of usersToMigrate) {
             try {
                 const plainTextPassword = user.password;
-                
-                // Hash password dengan bcrypt
                 const hashedPassword = await bcrypt.hash(plainTextPassword, SALT_ROUNDS);
 
-                // Update password di database dengan versi yang sudah di-hash
-                await connection.query(
+                await pool.query(
                     "UPDATE useraccounts SET password = ? WHERE nip = ?",
                     [hashedPassword, user.nip]
                 );
-                console.log(`- Password untuk NIP ${user.nip} berhasil di-hash.`);
 
+                console.log(`- Password untuk NIP ${user.nip} berhasil di-hash.`);
             } catch (hashError) {
                 console.error(`- Gagal memproses NIP ${user.nip}:`, hashError.message);
             }
         }
 
         console.log('✅ Migrasi password selesai!');
-
     } catch (error) {
         console.error('❌ Terjadi error saat migrasi:', error);
-    } finally {
-        if (connection) connection.release();
-        pool.end(); // Tutup koneksi pool setelah selesai
     }
 }
 
-// Jalankan fungsi migrasi
-migratePasswords();
+// Jalankan migrasi lalu tutup pool
+migratePasswords()
+

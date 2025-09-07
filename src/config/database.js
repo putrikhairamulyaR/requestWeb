@@ -15,9 +15,21 @@ const dbConfig = {
   multipleStatements: true
 };
 
-// 3. Buat connection pool berdasarkan konfigurasi
-const pool = mysql.createPool(dbConfig);
+const dbConfigTest = {
+  host:  'localhost',
+  user:  'root',
+  password: '',
+  database: 'db_test',
+  port:  3306,
+  waitForConnections: true,
+  connectionLimit: 50,
+  queueLimit: 0,
+  multipleStatements: true
+};
 
+// 3. Buat connection pool berdasarkan konfigurasi
+//const pool = mysql.createPool(dbConfig);
+const pool = mysql.createPool(dbConfigTest);
 // 4. Tambahkan kembali fungsi untuk mengetes koneksi
 /**
  * Memverifikasi koneksi ke database.
@@ -39,40 +51,13 @@ async function testConnection() {
 
 
 
-async function setupDatabase() {
-  let connection;
-  try {
-    connection = await mysql.createConnection(dbConfig);
-    console.log('Koneksi ke MySQL berhasil.');
 
-    // Gunakan db_test (sudah dibuat otomatis oleh Docker)
-    await connection.query(`USE \`${dbTest}\`;`);
-
-    // Baca file skema SQL
-    console.log('Membaca file skema SQL...');
-    const schemaPath = '/home/ori/webJadwalAgent/requestWeb/db_test.sql';
-    const schemaSql = fs.readFileSync(schemaPath, 'utf8');
-
-    // Jalankan skema SQL
-    console.log('Menjalankan skema SQL...');
-    await connection.query(schemaSql);
-
-    //console.log('✅ Setup database tes berhasil diselesaikan!');
-  } catch (error) {
-    //console.error('❌ Gagal melakukan setup database:', error);
-    process.exit(1);
-  } finally {
-    if (connection) {
-      await connection.end();
-      //console.log('Koneksi ditutup.');
-    }
-  }
-}
 
 
 
 // 5. Ekspor pool dan fungsi testConnection
 module.exports = {
   pool,
+ 
   testConnection
 };
