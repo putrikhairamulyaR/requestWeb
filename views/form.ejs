@@ -866,36 +866,40 @@
     <h2 style="text-align:center; color:#d80000; font-size:50px;">Form Pengajuan</h2>
 
     <div class="form-container">
-      <form method="POST" action="/form">
-        <!-- LIBUR -->
-        <h3>Pengajuan Libur</h3>
-        <label id="labelLibur">Sisa request Libur: <%= data.jatah.liburTersisa %></label>
-        <% if (data.jatah.liburTersisa > 0) { %>
-           <input type="number" id="jumlahLibur" name="jumlahLibur" min="0" max=<%= data.jatah.liburTersisa %> placeholder="Jumlah libur tahunan" />
-           <div id="tanggalLiburContainer" data-libur-tersisa="<%= data.jatah.liburTersisa %>"></div>
+  <form method="POST" action="/form">
+    <!-- LIBUR -->
+    <h3>Pengajuan Libur</h3>
+    <label id="labelLibur">Sisa request Libur: <%= data.jatah.liburTersisa %></label>
+    <% if (data.jatah.liburTersisa > 0) { %>
+      <input type="number" id="jumlahLibur" name="jumlahLibur" min="0" max="<%= data.jatah.liburTersisa %>" placeholder="Jumlah libur yang diajukan" />
+      <div id="tanggalLiburContainer"></div>
+    <% } else { %>
+      <input type="text" placeholder="Jatah libur sudah habis" disabled style="background-color: #f5f5f5; color: #999; cursor: not-allowed;" />
+    <% } %>
 
-        <% } else { %>
-          <div id="tanggalLiburContainer" data-libur-tersisa="0">
-            <input type="text" placeholder="Jatah libur sudah habis" disabled style="background-color: #f5f5f5; color: #999; cursor: not-allowed;" />
-          </div>
-        <% } %>
+    <!-- CUTI TAHUNAN -->
+    <h3>Pengajuan Cuti Tahunan</h3>
+    <label id="labelCuti">Sisa Cuti Tahunan: <%= data.jatah.cutiTersisa %></label>
+    <% if (data.jatah.cutiTersisa > 0) { %>
+      <input type="number" id="jumlahCuti" name="jumlahCuti" min="0" max="<%= data.jatah.cutiTersisa %>" placeholder="Jumlah cuti tahunan" />
+      <div id="tanggalCutiContainer"></div>
+    <% } else { %>
+      <input type="text" placeholder="Jatah cuti tahunan sudah habis" disabled style="background-color: #f5f5f5; color: #999; cursor: not-allowed;" />
+    <% } %>
 
-        <!-- CUTI TAHUNAN -->
-        <h3>Pengajuan Cuti Tahunan</h3>
-        <label id="labelCuti">Sisa Cuti Tahunan: <%= data.jatah.cutiTersisa %></label>
-        <input type="number" id="jumlahCuti" name="jumlahCuti" min="1" max=<%= data.jatah.cutiTersisa %> placeholder="Jumlah cuti tahunan" />
-        <div id="tanggalCutiContainer"></div>
+    <!-- CUTI CAP -->
+    <h3>Pengajuan Cuti CAP</h3>
+    <label id="labelCutiLain">Sisa Cuti CAP: <%= data.jatah.cutiLainTersisa %></label>
+    <% if (data.jatah.cutiLainTersisa > 0) { %>
+      <input type="number" id="jumlahCutiLain" name="jumlahCutiLain" min="0" max="<%= data.jatah.cutiLainTersisa %>" placeholder="Jumlah cuti CAP" />
+      <div id="tanggalCutiLainContainer"></div>
+    <% } else { %>
+      <input type="text" placeholder="Jatah cuti CAP sudah habis" disabled style="background-color: #f5f5f5; color: #999; cursor: not-allowed;" />
+    <% } %>
 
-        <!-- CUTI CAP -->
-        <h3>Pengajuan Cuti CAP</h3>
-        <label id="labelCutiLain">Sisa Cuti CAP: <%= data.jatah.cutiLainTersisa %></label>
-        <input type="number" id="jumlahCutiLain" name="jumlahCutiLain" min="1" max=<%= data.jatah.cutiLainTersisa %> placeholder="Jumlah cuti CAP" />
-        <div id="tanggalCutiLainContainer"></div>
-
-        <center><button type="submit">Ajukan</button></center>
-        <%- data.jatah.liburTersisa %>
-      </form>
-    </div>
+    <center><button type="submit">Ajukan</button></center>
+  </form>
+</div>
 
     <!-- RIWAYAT -->
     <div id="riwayat-section">
@@ -1044,18 +1048,29 @@
      // renderLiburAuto();
     //});
     
-   
-  
-    document.getElementById("jumlahLibur").addEventListener("input", e => {
+   const jumlahLibur=document.getElementById("jumlahLibur");
+   const jumlahCuti=document.getElementById("jumlahCuti");
+   const jumlahCutiLain=document.getElementById("jumlahCutiLain");
+
+
+   if(jumlahLibur){
+     document.getElementById("jumlahLibur").addEventListener("input", e => {
       renderTanggalInputLibur(e.target.value, "tanggalLiburContainer",disableDatesLibur);
     });
-
-    document.getElementById("jumlahCuti").addEventListener("input", e => {
+   }
+   if(jumlahCuti){
+     document.getElementById("jumlahCuti").addEventListener("input", e => {
       renderTanggalInputCuti(e.target.value, "tanggalCutiContainer",disableDatesLibur);
     });
-    document.getElementById("jumlahCutiLain").addEventListener("input", e => {
+   }
+   if(jumlahCutiLain){
+     document.getElementById("jumlahCutiLain").addEventListener("input", e => {
       renderTanggalInputCuti(e.target.value, "tanggalCutiLainContainer",disableDatesLibur);
     });
+   }
+  
+    
+
 
     // Dropdown functionality
     document.addEventListener('DOMContentLoaded', function() {
