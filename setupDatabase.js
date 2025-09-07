@@ -1,55 +1,85 @@
-// 1. Impor pustaka mysql2/promise
+// Muat environment variables terlebih dahulu, jika ada
+require('dotenv').config();
+
 const mysql = require('mysql2/promise');
-const dbTest = 'db_test';
 const fs = require('fs');
+const path = require('path');
 
+// --- KONFIGURASI ---
+const dbName =  'db_test';
+const dbPort =  3306; // Gunakan port 3307 untuk tes
 
-const pool = mysql.createPool({
+// Konfigurasi untuk terhubung ke SERVER MySQL, bukan database spesifik.
+const serverConfig = {
   host: process.env.DB_HOST || '127.0.0.1',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'db_test',
-  port: process.env.DB_PORT || 3306,
+  port: dbPort,
+  multipleStatements: true, // Izinkan eksekusi beberapa query dari file .sql
+};
+
+const dbConfigTest = {
+  host:  'localhost',
+  user:  'root',
+  password: '',
+  database: 'db_test',
+  port:  3306,
   waitForConnections: true,
   connectionLimit: 50,
   queueLimit: 0,
-  multipleStatements: true,
-});
+  multipleStatements: true
+};
 
+// 3. Buat connection pool berdasarkan konfigurasi
+//const pool = mysql.createPool(dbConfig);
+const pool = mysql.createPool(dbConfigTest);
 
-
-async function setupDatabase() {
+/**
+ * Fungsi ini akan:
+ * 1. Terhubung ke server MySQL.
+ * 2. Menghapus database tes lama (jika ada) untuk memastikan kebersihan.
+ * 3. Membuat database tes baru.
+ * 4. Menjalankan file db_test.sql untuk membuat tabel dan mengisi data.
+ */
+async function setupTestDatabase() {
   let connection;
+  console.log(`Memulai proses setup untuk database '${dbName}' di port ${dbPort}...`);
+  
   try {
-    connection = await mysql.createConnection(dbConfig);
-    //console.log('Koneksi ke MySQL berhasil.');
+    // 1. Buat koneksi ke server MySQL
+    connection = await mysql.createConnection(serverConfig);
+    console.log('🔌 Berhasil terhubung ke server MySQL.');
 
-    // Gunakan db_test (sudah dibuat otomatis oleh Docker)
-    await connection.query(`USE \`${dbTest}\`;`);
+    // 2. Hapus database lama dan buat yang baru
+    
+    await connection.query(`USE \`${dbName}\`;`);
+    console.log(`Database '${dbName}' berhasil dibuat dan dipilih.`);
 
-    // Baca file skema SQL
-    //console.log('Membaca file skema SQL...');
-    const schemaPath = '/home/ori/webJadwalAgent/requestWeb/db_test.sql';
+    // 3. Baca file .sql untuk membuat tabel dan data
+    // Pastikan file db_test.sql ada di root folder proyek Anda
+    const schemaPath = path.join(__dirname, 'db_test.sql'); 
     const schemaSql = fs.readFileSync(schemaPath, 'utf8');
 
-    // Jalankan skema SQL
-    //console.log('Menjalankan skema SQL...');
+    console.log('⚙️  Menjalankan skema SQL untuk membuat tabel dan data...');
     await connection.query(schemaSql);
 
-    //console.log('✅ Setup database tes berhasil diselesaikan!');
+    console.log('✅ Setup database tes berhasil diselesaikan!');
+
   } catch (error) {
-    //console.error('❌ Gagal melakukan setup database:', error);
-    process.exit(1);
+    console.error('❌ Gagal melakukan setup database:', error);
+    process.exit(1); // Keluar dari skrip jika ada error
   } finally {
+    // 4. Tutup koneksi agar skrip bisa berhenti
     if (connection) {
       await connection.end();
-      //console.log('Koneksi ditutup.');
+      console.log('Koneksi ditutup.');
     }
   }
 }
 
-//setupDatabase();
+// Panggil fungsi untuk memulai proses
+//setupTestDatabase();
 
-module.exports = {
+module.exports={
   pool
 };

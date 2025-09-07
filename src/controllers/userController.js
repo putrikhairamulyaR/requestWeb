@@ -56,7 +56,8 @@ async function showFormPage(req, res) {
 
     // 2. Panggil service untuk mengambil semua data yang dibutuhkan oleh halaman
     const pageData = await formService.getInitialData(token);
-
+    console.log('pageData');
+    console.log(pageData);
     // 3. Render file 'form.ejs' dan kirimkan semua data yang diperlukan
     res.render('form', {
       user: req.session.user, // Info user untuk ditampilkan di header

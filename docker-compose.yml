@@ -17,10 +17,7 @@ services:
       timeout: 3s
       retries: 20
   
-  redis: # <-- SERVICE BARU
-    image: redis:alpine # Gunakan image yang ringan
-    container_name: requestweb-redis
-    restart: always
+  
 
   web:
     build: .
@@ -28,8 +25,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      redis: # <-- Tambahkan dependensi ke Redis
-        condition: service_started # Cukup 'started' untuk Redis
+      
     environment:
       NODE_ENV: production
       PORT: 3000
@@ -39,7 +35,7 @@ services:
       DB_NAME: ${DB_NAME}
       DB_PORT: 3306
       JWT_SECRET: ${JWT_SECRET}
-      REDIS_HOST: "redis"
+      
     ports:
       - "3000:3000"
     restart: unless-stopped

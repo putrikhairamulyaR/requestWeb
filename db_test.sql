@@ -40,7 +40,8 @@ INSERT INTO `useraccounts` (`nip`, `nama`, `jenis_kelamin`, `lokasi`, `code`, `p
 (400087, 'MOCHAMAD AKBAR FIRDAUS', 'L', 'B', 'B23', '123'),
 (400090, 'REZA APRIANA', 'L', 'B', 'B27', '123'),
 (400091, 'UDIN', 'L', 'B', 'B26', '123'),
-(400092, 'BUDI', 'L', 'B', 'B29', '123');
+(400092, 'BUDI', 'L', 'B', 'B29', '123'),
+(400093, 'ASEP', 'L', 'B', 'B30', '123');
 
 -- ===============================
 -- Table: request
@@ -64,7 +65,8 @@ INSERT INTO `request` (`timestamp`, `nip`, `jenis_pengajuan`, `status_pengajuan`
 VALUES 
 (NOW(), 400087, 'Cuti Lainnya', 'Pengajuan Pertama', '2025-09-10', NULL),
 (NOW(), 400090, 'Libur', 'Pengajuan Pertama', '2025-09-11', NULL),
-(NOW(), 400087, 'Libur', 'Pengajuan Pertama', '2025-09-11',NULL),
+(NOW(), 400092, 'Libur', 'Pengajuan Pertama', '2025-09-11',NULL),
+(NOW(), 400093, 'Libur', 'Pengajuan Pertama', '2025-09-11',NULL),
 (NOW(), 400087, 'Cuti', 'Pengajuan Pertama', '2025-09-12',NULL),
 (NOW(), 400090, 'Libur', 'Pengajuan Pertama', '2025-09-12',NULL),
 (NOW(), 400091, 'Libur', 'Pengajuan Pertama', '2025-09-12',NULL),

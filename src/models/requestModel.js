@@ -37,7 +37,7 @@ class Request {
       WHERE jenis_pengajuan = 'libur'
       GROUP BY tanggal
       HAVING COUNT(*) >= ?`;
-    const [rows] = await pool.query(sql, [CONFIG.QUOTA.HARIAN]);
+    const [rows] = await pool.query(sql, 3);
     return rows.map(r => r.tgl);
   }
 

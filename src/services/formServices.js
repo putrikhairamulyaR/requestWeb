@@ -90,6 +90,8 @@ async function processPengajuan(token, formData) {
       "cuti lainnya": extractDates("tanggalCutiLainContainer", formData.jumlahCutiLain)
     };
 
+    
+
     for (const jenis in allDates) {
       for (const tanggal of allDates[jenis]) {
         try {

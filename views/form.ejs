@@ -871,7 +871,9 @@
         <h3>Pengajuan Libur</h3>
         <label id="labelLibur">Sisa request Libur: <%= data.jatah.liburTersisa %></label>
         <% if (data.jatah.liburTersisa > 0) { %>
-          <div id="tanggalLiburContainer" data-libur-tersisa="<%= data.jatah.liburTersisa %>"></div>
+           <input type="number" id="jumlahLibur" name="jumlahLibur" min="0" max=<%= data.jatah.liburTersisa %> />
+           <div id="tanggalLiburContainer" data-libur-tersisa="<%= data.jatah.liburTersisa %>"></div>
+
         <% } else { %>
           <div id="tanggalLiburContainer" data-libur-tersisa="0">
             <input type="text" placeholder="Jatah libur sudah habis" disabled style="background-color: #f5f5f5; color: #999; cursor: not-allowed;" />
@@ -881,13 +883,13 @@
         <!-- CUTI TAHUNAN -->
         <h3>Pengajuan Cuti Tahunan</h3>
         <label id="labelCuti">Sisa Cuti Tahunan: <%= data.jatah.cutiTersisa %></label>
-        <input type="number" id="jumlahCuti" name="jumlahCuti" min="1" max="31" placeholder="Jumlah cuti tahunan" />
+        <input type="number" id="jumlahCuti" name="jumlahCuti" min="1" max=<%= data.jatah.cutiTersisa %> placeholder="Jumlah cuti tahunan" />
         <div id="tanggalCutiContainer"></div>
 
         <!-- CUTI CAP -->
         <h3>Pengajuan Cuti CAP</h3>
         <label id="labelCutiLain">Sisa Cuti CAP: <%= data.jatah.cutiLainTersisa %></label>
-        <input type="number" id="jumlahCutiLain" name="jumlahCutiLain" min="1" max="31" placeholder="Jumlah cuti CAP" />
+        <input type="number" id="jumlahCutiLain" name="jumlahCutiLain" min="1" max=<%= data.jatah.cutiLainTersisa %> placeholder="Jumlah cuti CAP" />
         <div id="tanggalCutiLainContainer"></div>
 
         <center><button type="submit">Ajukan</button></center>
@@ -967,9 +969,21 @@
     </div>
   </div>
 
+<div id="user-info" data-disable='<%- JSON.stringify(data.disableDatesLibur || []) %>'></div>
+
+<script>
+  const userDiv = document.getElementById("user-info");
+  const disableDatesLibur = JSON.parse(userDiv.dataset.disable);
+  console.log(disableDatesLibur);
+</script>
+
+  
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  
+  
+
   <script>
-    function renderTanggalInput(jumlah, containerId) {
+    function renderTanggalInput(jumlah, containerId,disableDate) {
       const container = document.getElementById(containerId);
       container.innerHTML = "";
       for (let i = 1; i <= jumlah; i++) {
@@ -981,7 +995,8 @@
 
         flatpickr(input, {
           dateFormat: "Y-m-d",
-          minDate: "today"
+          minDate: "today",
+          disable: disableDate
         });
       }
     }
@@ -1007,15 +1022,21 @@
     }
 
     // Auto render libur saat halaman dimuat
-    document.addEventListener('DOMContentLoaded', function() {
-      renderLiburAuto();
+   // document.addEventListener('DOMContentLoaded', function() {
+     // renderLiburAuto();
+    //});
+    
+   
+  
+    document.getElementById("jumlahLibur").addEventListener("input", e => {
+      renderTanggalInput(e.target.value, "tanggalLiburContainer",disableDatesLibur);
     });
 
     document.getElementById("jumlahCuti").addEventListener("input", e => {
-      renderTanggalInput(e.target.value, "tanggalCutiContainer");
+      renderTanggalInput(e.target.value, "tanggalCutiContainer",disableDatesLibur);
     });
     document.getElementById("jumlahCutiLain").addEventListener("input", e => {
-      renderTanggalInput(e.target.value, "tanggalCutiLainContainer");
+      renderTanggalInput(e.target.value, "tanggalCutiLainContainer",disableDatesLibur);
     });
 
     // Dropdown functionality
