@@ -248,18 +248,12 @@ async function handleDelete(req, res) {
 }
 
 
-// Controller untuk logout
 function handleLogout(req, res) {
-  // Hapus session
-  req.session.destroy((err) => {
-    if (err) {
-      console.error('Error saat logout:', err);
-      return res.status(500).render('error', { message: 'Gagal logout. Silakan coba lagi.' });
-    }
-    
-    // Redirect ke halaman login
-    res.redirect('/auth/login');
-  });
+  // Atur sesi menjadi null untuk menghapusnya
+  req.session = null;
+  
+  // Redirect ke halaman login
+  res.redirect('/auth/login');
 }
 
 // Controller untuk menampilkan halaman admin
