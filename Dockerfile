@@ -1,6 +1,3 @@
-# syntax=docker/dockerfile:1
-
-# --- Base image ---
 FROM node:20-alpine AS base
 
 WORKDIR /app
@@ -31,5 +28,3 @@ COPY . .
 EXPOSE 3000
 
 CMD ["node", "server.js"]
-
-

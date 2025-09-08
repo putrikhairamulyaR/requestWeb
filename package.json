@@ -9,6 +9,7 @@
     "test": "jest",
     "db:setup": "node src/config/database.js"
   },
+
   "keywords": [
     "web-app",
     "mysql",
@@ -16,7 +17,8 @@
     "cuti",
     "libur"
   ],
-  "author": "",
+  "author": "ori",
+
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
