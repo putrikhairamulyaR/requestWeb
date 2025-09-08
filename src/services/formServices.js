@@ -64,7 +64,9 @@ async function getInitialData(token) {
 async function processPengajuan(token, formData) {
   const user = await authService.verifyUserToken(token);
   if (!user) throw new Error("Sesi tidak valid.");
+  
 
+  
   const connection = await pool.getConnection();
   const results = {
     success: [],
@@ -130,8 +132,8 @@ async function processPengajuan(token, formData) {
               "SELECT COUNT(*) as jumlah FROM request WHERE jenis_pengajuan = ? AND tanggal = ?",
               [jenis, tanggal]
             );
-            if (rows[0].jumlah >= 5) {
-              results.failed.push({ jenis, tanggal, reason: "Kuota libur penuh (maks 5 orang)" });
+            if (rows[0].jumlah >= 3) {
+              results.failed.push({ jenis, tanggal, reason: "Kuota libur penuh (maks 3 orang)" });
               continue;
             }
           }
@@ -147,6 +149,9 @@ async function processPengajuan(token, formData) {
   } finally {
     connection.release();
   }
+
+  console.log('result failed'+results.failed);
+  console.log('result succes'+results.success);
 
   return results;
 }
