@@ -64,14 +64,9 @@ async function getInitialData(token) {
 async function processPengajuan(token, formData) {
   const user = await authService.verifyUserToken(token);
   if (!user) throw new Error("Sesi tidak valid.");
-  
 
-  
   const connection = await pool.getConnection();
-  const results = {
-    success: [],
-    failed: []
-  };
+  const results = { success: [], failed: [] };
 
   try {
     function extractDates(prefix, jumlah) {
@@ -79,9 +74,7 @@ async function processPengajuan(token, formData) {
       const count = parseInt(jumlah || "0", 10);
       for (let i = 1; i <= count; i++) {
         const key = `${prefix}_tanggal${i}`;
-        if (formData[key]) {
-          dates.push(formData[key]);
-        }
+        if (formData[key]) dates.push(formData[key]);
       }
       return dates;
     }
@@ -92,56 +85,51 @@ async function processPengajuan(token, formData) {
       "cuti lainnya": extractDates("tanggalCutiLainContainer", formData.jumlahCutiLain)
     };
 
-    
-
     for (const jenis in allDates) {
       for (const tanggal of allDates[jenis]) {
         try {
-          // 🔹 Mapping jenis -> key quota
-          let quotaKey;
-          if (jenis === "libur") quotaKey = "LIBUR";
-          else if (jenis === "cuti") quotaKey = "CUTI";
-          else quotaKey = "CUTI_LAINNYA";
-
-          // 🔹 Cek quota individu
-          const [countRows] = await connection.query(
-            "SELECT COUNT(*) as jumlah FROM request WHERE nip = ? AND jenis_pengajuan = ?",
-            [user.nip, jenis]
-          );
-          const currentCount = countRows[0].jumlah;
+          let quotaKey =
+            jenis === "libur" ? "LIBUR" :
+            jenis === "cuti" ? "CUTI" : "CUTI_LAINNYA";
           const maxQuota = CONFIG.QUOTA[quotaKey];
 
+          // Mulai transaksi
+          await connection.beginTransaction();
+
+          // 🔹 Cek quota individu
+          const currentCount = await Request.countByNip(connection, user.nip, jenis);
           if (currentCount >= maxQuota) {
+            await connection.rollback();
             results.failed.push({ jenis, tanggal, reason: `Melebihi jatah ${jenis} (maks ${maxQuota})` });
             continue;
           }
 
-          // 🔹 Cek duplikat tanggal untuk user yang sama (semua jenis)
-          const [duplicateRows] = await connection.query(
-            "SELECT COUNT(*) as jumlah FROM request WHERE nip = ? AND tanggal = ?",
-            [user.nip, tanggal]
-          );
-          if (duplicateRows[0].jumlah > 0) {
+          // 🔹 Cek duplikat tanggal
+          const duplicateCount = await Request.countDuplicateDate(connection, user.nip, tanggal);
+          if (duplicateCount > 0) {
+            await connection.rollback();
             results.failed.push({ jenis, tanggal, reason: "Tanggal yang dimasukkan sudah ada" });
             continue;
           }
 
-          // 🔹 Cek kuota global (misalnya libur max 5 orang per tanggal)
+          // 🔹 Cek kuota global dengan lock
           if (jenis === "libur") {
-            const [rows] = await connection.query(
-              "SELECT COUNT(*) as jumlah FROM request WHERE jenis_pengajuan = ? AND tanggal = ?",
-              [jenis, tanggal]
-            );
-            if (rows[0].jumlah >= 3) {
+            const totalOnDate = await Request.countByJenisTanggalForUpdate(connection, jenis, tanggal);
+            if (totalOnDate >= 3) {
+              await connection.rollback();
               results.failed.push({ jenis, tanggal, reason: "Kuota libur penuh (maks 3 orang)" });
               continue;
             }
           }
 
-          // 🔹 Insert request
+          // 🔹 Insert (pakai model)
           await Request.create(connection, user.nip, jenis, tanggal);
+
+          await connection.commit();
           results.success.push({ jenis, tanggal });
+
         } catch (err) {
+          await connection.rollback();
           results.failed.push({ jenis, tanggal, reason: err.message });
         }
       }
@@ -150,11 +138,9 @@ async function processPengajuan(token, formData) {
     connection.release();
   }
 
-  console.log('result failed'+results.failed);
-  console.log('result succes'+results.success);
-
   return results;
 }
+
 
 async function updateTanggal(token, jenis, tanggalLama, tanggalBaru) {
   // 1. Verifikasi sesi pengguna

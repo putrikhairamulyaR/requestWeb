@@ -15,6 +15,30 @@ class Request {
     return rows;
   }
 
+  static async countDuplicateDate(connection, nip, tanggal) {
+    const [rows] = await connection.query(
+      "SELECT COUNT(*) as jumlah FROM request WHERE nip = ? AND tanggal = ?",
+      [nip, tanggal]
+    );
+    return rows[0].jumlah;
+  }
+  
+  static async countByJenisTanggal(connection, jenis, tanggal) {
+    const [rows] = await connection.query(
+      "SELECT COUNT(*) as jumlah FROM request WHERE jenis_pengajuan = ? AND tanggal = ?",
+      [jenis, tanggal]
+    );
+    return rows[0].jumlah;
+  }
+
+  static async countByNip(connection, nip, jenis) {
+    const [rows] = await connection.query(
+      "SELECT COUNT(*) as jumlah FROM request WHERE nip = ? AND jenis_pengajuan = ?",
+      [nip, jenis]
+    );
+    return rows[0].jumlah;
+  }
+
   /**
    * Mengambil semua riwayat pengajuan untuk seorang pengguna.
    */
@@ -106,6 +130,14 @@ class Request {
     const sql = `DELETE FROM request WHERE nip = ? AND jenis_pengajuan = ? AND tanggal = ?`;
     const [result] = await pool.query(sql, [nip, jenis, tanggal]);
     return result;
+  }
+
+  static async countByJenisTanggalForUpdate(connection, jenis, tanggal) {
+    const [rows] = await connection.query(
+      "SELECT COUNT(*) as jumlah FROM request WHERE jenis_pengajuan = ? AND tanggal = ? FOR UPDATE",
+      [jenis, tanggal]
+    );
+    return rows[0].jumlah;
   }
 
   /**
