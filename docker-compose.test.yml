@@ -1,0 +1,24 @@
+services:
+  db_test:
+    image: mysql:8.0
+    container_name: requestweb-mysql-test  # Nama container berbeda agar tidak konflik
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_DATABASE: db_test      # PENTING: Nama database khusus untuk tes
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      # Kita tetap memetakan ke port 3306 di host
+      # agar script 'npm run db:setup' bisa terhubung dari luar container
+      - "3306:3306"
+    restart: always
+    volumes:
+      # Kita bisa menggunakan volume terpisah untuk data tes jika perlu
+      - db_test_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  db_test_data:

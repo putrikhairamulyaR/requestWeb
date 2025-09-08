@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Form Update Pengajuan</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      background:#f9f9f9; 
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Top Bar Styles */
+    .top-bar {
+      width: 100%;
+      background-color: #f8f8f8;
+      padding: 20px 30px;
+      border-bottom: 2px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-sizing: border-box;
+    }
+    .top-bar a {
+      font-size: 40px !important;
+      color: #d80000;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: color .2s;
+    }
+    .top-bar a:hover {
+      color: #d80000;
+    }
+    .top-bar .material-icons-outlined {
+        font-size: 40px !important;
+        margin-right: 8px;
+    }
+
+    /* Dropdown Menu */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown .dropdown-toggle {
+      cursor: pointer;
+    }
+    #userNipDisplay {
+      margin: 0 5px;
+    }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: #ffffff;
+      min-width: 200px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      border-radius: 8px;
+      z-index: 100;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+    .dropdown-menu a {
+      color: #333;
+      padding: 12px 18px;
+      font-size: 40px !important;
+    }
+    .dropdown-menu a:hover {
+      background-color: #f1f1f1;
+    }
+    .dropdown-menu.show {
+      display: block;
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .container { 
+      max-width: 720px; 
+      margin:auto; 
+      background:#fff; 
+      padding:24px; 
+      border-radius:12px; 
+      box-shadow:0 2px 10px rgba(0,0,0,.12); 
+    }
+    h2 { text-align:center; color:#d80000; margin-top:0; }
+    label { font-weight:bold; display:block; margin-top:14px; margin-bottom:8px; }
+    select, input[type="date"] {
+      width:100%; padding:12px 14px; border:1px solid #ccc; border-radius:10px; box-sizing:border-box; background:#fff;
+    }
+    .rows { margin-top:10px; }
+    .row {
+      display:flex; gap:14px; align-items:center; margin-bottom:12px;
+      background:#fafafa; padding:12px; border:1px solid #eee; border-radius:10px;
+    }
+    .row input[type="date"] { flex:1; }
+    .btn { padding:10px 16px; border:none; border-radius:10px; color:#fff; cursor:pointer; font-weight:bold; }
+    .btn-edit { background:#ffa000; }
+    .btn-delete { background:#d64141; }
+    .btn:disabled { opacity:.6; cursor:not-allowed; }
+    .empty { padding:14px; text-align:center; color:#666; background:#f6f6f6; border-radius:8px; border:1px dashed #ddd; }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .top-bar { padding: 10px 15px; }
+      .top-bar a { font-size: 40px !important; }
+      .top-bar a #userNipDisplay { display: none; }
+      .dropdown-menu { min-width: 160px; }
+      .content { padding: 15px; }
+    }
+
+    /* Universal Custom Modal */
+    .custom-modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .custom-modal.show {
+      display: flex;
+    }
+
+    .custom-modal-content {
+      background: #fff;
+      padding: 0;
+      border-radius: 16px;
+      width: 400px;
+      max-width: 90%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      animation: slideIn 0.3s ease;
+      overflow: hidden;
+    }
+
+    @keyframes slideIn {
+      from { 
+        opacity: 0; 
+        transform: translateY(-50px) scale(0.9); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+      }
+    }
+
+    .custom-modal-header {
+      color: white;
+      padding: 20px 25px;
+      text-align: center;
+      position: relative;
+    }
+
+    .custom-modal-header.success {
+      background: linear-gradient(135deg, #28a745, #20c997);
+    }
+
+    .custom-modal-header.error {
+      background: linear-gradient(135deg, #dc3545, #fd7e14);
+    }
+
+    .custom-modal-header.warning {
+      background: linear-gradient(135deg, #ffc107, #fd7e14);
+    }
+
+    .custom-modal-header.info {
+      background: linear-gradient(135deg, #17a2b8, #6f42c1);
+    }
+
+    .custom-modal-header.logout {
+      background: linear-gradient(135deg, #d80000, #ff4444);
+    }
+
+    .custom-modal-header h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .custom-modal-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
+
+    .custom-modal-body {
+      padding: 25px;
+      text-align: center;
+    }
+
+    .custom-modal-message {
+      font-size: 16px;
+      color: #333;
+      line-height: 1.5;
+      margin-bottom: 25px;
+    }
+
+    .custom-modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .custom-modal-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 100px;
+    }
+
+    .custom-modal-btn-cancel {
+      background: #f8f9fa;
+      color: #6c757d;
+      border: 2px solid #e9ecef;
+    }
+
+    .custom-modal-btn-cancel:hover {
+      background: #e9ecef;
+      border-color: #dee2e6;
+      transform: translateY(-1px);
+    }
+
+    .custom-modal-btn-confirm {
+      background: linear-gradient(135deg, #d80000, #ff4444);
+      color: white;
+      border: 2px solid #d80000;
+    }
+
+    .custom-modal-btn-confirm:hover {
+      background: linear-gradient(135deg, #b30000, #e63939);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(216, 0, 0, 0.3);
+    }
+
+    .custom-modal-btn-success {
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      border: 2px solid #28a745;
+    }
+
+    .custom-modal-btn-success:hover {
+      background: linear-gradient(135deg, #218838, #1e7e34);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <a href="/form">
+      <span class="material-icons-outlined">arrow_back</span>
+      Kembali
+    </a>
+    <div class="dropdown">
+      <a id="userDropdownToggle" class="dropdown-toggle">
+        <span class="material-icons-outlined">account_circle</span>
+        <span id="userNipDisplay"><%= user.nip %></span>
+        <span class="material-icons-outlined">arrow_drop_down</span>
+      </a>
+      <div id="userDropdownMenu" class="dropdown-menu">
+        <a id="logoutLink" href="/logout">
+          <span class="material-icons-outlined">logout</span> Logout
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="container">
+    <h2>Form Update Pengajuan</h2>
+
+    <label for="jenis">Jenis Pengajuan</label>
+    <select id="jenis">
+      <option value="libur">Libur</option>
+      <option value="cuti">Cuti</option>
+      <option value="cutiLain">Cuti Lainnya</option>
+    </select>
+
+    <div id="tanggalList" class="rows"></div>
+    </div>
+  </div>
+
+  <!-- Universal Custom Modal -->
+  <div id="customModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <div id="modalHeader" class="custom-modal-header">
+        <div id="modalIcon" class="custom-modal-icon">🚪</div>
+        <h3 id="modalTitle">Konfirmasi</h3>
+      </div>
+      <div class="custom-modal-body">
+        <div id="modalMessage" class="custom-modal-message">
+          Apakah Anda yakin?
+        </div>
+        <div id="modalButtons" class="custom-modal-buttons">
+          <button id="modalCancelBtn" class="custom-modal-btn custom-modal-btn-cancel" onclick="hideCustomModal()">
+            Batal
+          </button>
+          <button id="modalConfirmBtn" class="custom-modal-btn custom-modal-btn-confirm" onclick="confirmCustomModal()">
+            Ya
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suntik data dari backend secara AMAN -->
+  <script id="initial-data" type="application/json">
+    <%- JSON.stringify(data || { libur:[], cuti:[], cutiLain:[] }) %>
+  </script>
+
+  <script>
+    // Ambil & normalisasi data dari backend
+    let data;
+    try {
+      const raw = document.getElementById('initial-data').textContent || '{}';
+      const parsed = JSON.parse(raw);
+      data = {
+        libur: Array.isArray(parsed.libur) ? parsed.libur : [],
+        cuti: Array.isArray(parsed.cuti) ? parsed.cuti : [],
+        cutiLain: Array.isArray(parsed.cutiLain) ? parsed.cutiLain : [],
+        tanggalMerah: Array.isArray(parsed.tanggalMerah) ? parsed.tanggalMerah : [],
+        disableDatesLibur: Array.isArray(parsed.disableDatesLibur) ? parsed.disableDatesLibur : [],
+        jatah: parsed.jatah || { liburTersisa: 0, cutiTersisa: 0, cutiLainTersisa: 0 }
+      };
+    } catch (e) {
+      console.error('Gagal parsing data dari server:', e);
+      data = { 
+        libur:[], 
+        cuti:[], 
+        cutiLain:[], 
+        tanggalMerah: [], 
+        disableDatesLibur: [], 
+        jatah: { liburTersisa: 0, cutiTersisa: 0, cutiLainTersisa: 0 } 
+      };
+    }
+
+    const jenisSelect = document.getElementById('jenis');
+    const tanggalList = document.getElementById('tanggalList');
+
+    function renderTanggal() {
+      const jenis = jenisSelect.value;          // 'libur' | 'cuti' | 'cutiLain'
+      tanggalList.innerHTML = '';
+
+      const arr = data[jenis] || [];
+      
+      // Untuk libur, tampilkan kolom sesuai jatah yang tersisa
+      if (jenis === 'libur') {
+        const jatahTersisa = data.jatah ? data.jatah.liburTersisa : 0;
+        const maxKolom = Math.max(arr.length, jatahTersisa);
+        
+        if (maxKolom === 0) {
+          tanggalList.innerHTML = '<div class="empty">Jatah libur sudah habis.</div>';
+          return;
+        }
+        
+        // Tampilkan kolom sesuai jatah yang tersisa
+        for (let i = 0; i < maxKolom; i++) {
+          const tgl = arr[i] || ''; // Ambil tanggal yang ada atau kosong
+          renderTanggalRow(tgl, i, jenis);
+        }
+      } else {
+        // Untuk cuti dan cuti lainnya, tampilkan seperti biasa
+        if (!arr.length) {
+          tanggalList.innerHTML = '<div class="empty">Belum ada tanggal untuk jenis ini.</div>';
+          return;
+        }
+        
+        arr.forEach((tgl, index) => {
+          renderTanggalRow(tgl, index, jenis);
+        });
+      }
+    }
+
+    function renderTanggalRow(tgl, index, jenis) {
+      const row = document.createElement('div');
+      row.className = 'row';
+
+      const input = document.createElement('input');
+      input.type = 'date';
+      input.value = tgl; // format backend sudah YYYY-MM-DD
+      
+      // Set min date to today
+      const today = new Date().toISOString().split('T')[0];
+      input.min = today;
+      
+      // Disable tanggal merah dan tanggal kuota penuh
+      input.addEventListener('focus', function() {
+        // Set disabled dates
+        if (typeof data.tanggalMerah !== 'undefined') {
+          data.tanggalMerah.forEach(holiday => {
+            this.setAttribute('data-disabled-' + holiday, 'true');
+          });
+        }
+        
+        if (jenis === 'libur' && typeof data.disableDatesLibur !== 'undefined') {
+          data.disableDatesLibur.forEach(disabledDate => {
+            this.setAttribute('data-disabled-' + disabledDate, 'true');
+          });
+        }
+      });
+
+      // Validasi tanggal saat input berubah
+      input.addEventListener('change', function() {
+        const selectedDate = this.value;
+        
+        // Cek tanggal merah
+        if (typeof data.tanggalMerah !== 'undefined') {
+          if (data.tanggalMerah.includes(selectedDate)) {
+            this.value = '';
+            alert('Tanggal ini adalah hari libur nasional!');
+            return;
+          }
+        }
+        
+        // Cek tanggal yang sudah penuh (untuk libur)
+        if (jenis === 'libur' && typeof data.disableDatesLibur !== 'undefined') {
+          if (data.disableDatesLibur.includes(selectedDate)) {
+            this.value = '';
+            alert('Kuota untuk tanggal ini sudah penuh!');
+            return;
+          }
+        }
+      });
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'btn btn-edit';
+      editBtn.textContent = tgl ? 'Edit' : 'Simpan';
+      editBtn.onclick = async () => {
+        const oldDate = tgl; // Tanggal asli dari array
+        const newDate = input.value; // Nilai dari input
+        
+        // Debug logging
+        console.log('Edit clicked:', { jenis, oldDate, newDate, index });
+        
+        // Validasi input
+        if (!newDate) {
+          alert('Silakan pilih tanggal baru!');
+          return;
+        }
+        
+        // Jika oldDate kosong (kolom baru), ini adalah insert, bukan update
+        if (!oldDate) {
+          // Ini adalah kolom kosong baru, lakukan insert
+          editBtn.disabled = true;
+          editBtn.textContent = 'Menyimpan...';
+          try {
+            console.log('Insert data:', { jenis, tanggal: newDate });
+            
+            const res = await fetch('/api/add-date', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({
+                jenis: jenis,
+                tanggal: newDate
+              })
+            });
+            
+            // Cek apakah response adalah JSON
+            const contentType = res.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+              const text = await res.text();
+              console.error('Non-JSON response:', text);
+              throw new Error('Server mengembalikan response yang tidak valid');
+            }
+            
+            const result = await res.json();
+            
+            if (result.success) {
+              showCustomModal({
+                type: 'success',
+                title: 'Berhasil',
+                message: result.message || 'Tanggal berhasil ditambahkan!',
+                icon: '✅',
+                confirmText: 'OK',
+                showCancel: false,
+                onConfirm: () => {
+                  // Update data lokal
+                  data[jenis][index] = newDate;
+                  renderTanggal(); // Refresh tampilan
+                }
+              });
+            } else {
+              showCustomModal({
+                type: 'error',
+                title: 'Gagal',
+                message: result.message || 'Gagal menambahkan tanggal!',
+                icon: '❌',
+                confirmText: 'OK',
+                showCancel: false,
+                onConfirm: () => {}
+              });
+            }
+          } catch (err) {
+            console.error('Error inserting date:', err);
+            showCustomModal({
+              type: 'error',
+              title: 'Error',
+              message: 'Gagal menambahkan tanggal: ' + err.message,
+              icon: '❌',
+              confirmText: 'OK',
+              showCancel: false,
+              onConfirm: () => {}
+            });
+          } finally {
+            editBtn.disabled = false;
+            editBtn.textContent = 'Edit';
+          }
+          return;
+        }
+        
+        if (oldDate === newDate) {
+          alert('Tidak ada perubahan pada tanggal!');
+          return;
+        }
+        
+        editBtn.disabled = true;
+        editBtn.textContent = 'Menyimpan...';
+        try {
+          const res = await fetch('/pengajuan-ulang', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              jenis: jenis,
+              oldDate: oldDate,
+              newDate: newDate
+            })
+          });
+          const result = await res.json();
+          
+          if (result.success) {
+            alert(result.message || 'Tanggal berhasil diupdate!');
+            // Update data lokal
+            data[jenis][index] = newDate;
+            
+            // Remove duplicates from the array
+            data[jenis] = [...new Set(data[jenis])];
+            
+            renderTanggal(); // Refresh tampilan
+          } else {
+            alert(result.message || 'Gagal update tanggal!');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Gagal update tanggal!');
+        } finally {
+          editBtn.disabled = false;
+          editBtn.textContent = 'Edit';
+        }
+      };
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'btn btn-delete';
+      deleteBtn.textContent = 'Hapus';
+      deleteBtn.onclick = async () => {
+        // Validasi untuk delete
+        if (!tgl) {
+          // Jika kolom kosong, hapus dari UI saja
+          data[jenis].splice(index, 1);
+          renderTanggal();
+          return;
+        }
+        
+        if (!confirm(`Hapus tanggal ${tgl}?`)) return;
+        
+        // Debug logging
+        console.log('Delete clicked:', { jenis, tanggal: tgl, index });
+        
+        deleteBtn.disabled = true;
+        deleteBtn.textContent = 'Menghapus...';
+        try {
+          const res = await fetch('/pengajuan-ulang', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              jenis: jenis,
+              tanggal: tgl
+            })
+          });
+          const result = await res.json();
+          
+          if (result.success) {
+            alert(result.message || 'Tanggal berhasil dihapus!');
+            // Hapus di UI setelah server OK
+            data[jenis].splice(index, 1);
+            
+            // Remove duplicates from the array
+            data[jenis] = [...new Set(data[jenis])];
+            
+            renderTanggal();
+          } else {
+            alert(result.message || 'Gagal menghapus tanggal!');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Gagal menghapus tanggal!');
+        } finally {
+          deleteBtn.disabled = false;
+          deleteBtn.textContent = 'Hapus';
+        }
+      };
+
+      row.appendChild(input);
+      row.appendChild(editBtn);
+      row.appendChild(deleteBtn);
+      tanggalList.appendChild(row);
+    }
+
+
+    // Event & render awal
+    jenisSelect.addEventListener('change', renderTanggal);
+    renderTanggal();
+
+    // Dropdown functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const dropdownToggle = document.getElementById('userDropdownToggle');
+      const dropdownMenu = document.getElementById('userDropdownMenu');
+      const logoutLink = document.getElementById('logoutLink');
+
+      // Toggle dropdown
+      dropdownToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        dropdownMenu.classList.toggle('show');
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+          dropdownMenu.classList.remove('show');
+        }
+      });
+
+      // Logout confirmation
+      logoutLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        showCustomModal({
+          type: 'logout',
+          title: 'Konfirmasi Logout',
+          message: 'Apakah Anda yakin ingin keluar dari sistem?',
+          icon: '🚪',
+          confirmText: 'Ya, Logout',
+          onConfirm: () => window.location.href = '/logout'
+        });
+      });
+    });
+
+    // Universal modal functions
+    let currentModalCallback = null;
+
+    function showCustomModal(options) {
+      const modal = document.getElementById('customModal');
+      const header = document.getElementById('modalHeader');
+      const icon = document.getElementById('modalIcon');
+      const title = document.getElementById('modalTitle');
+      const message = document.getElementById('modalMessage');
+      const confirmBtn = document.getElementById('modalConfirmBtn');
+      const cancelBtn = document.getElementById('modalCancelBtn');
+
+      // Set modal content
+      icon.textContent = options.icon || '❓';
+      title.textContent = options.title || 'Konfirmasi';
+      message.textContent = options.message || 'Apakah Anda yakin?';
+      confirmBtn.textContent = options.confirmText || 'Ya';
+      
+      // Set header style based on type
+      header.className = `custom-modal-header ${options.type || 'info'}`;
+      
+      // Set button style based on type
+      confirmBtn.className = `custom-modal-btn ${options.type === 'success' ? 'custom-modal-btn-success' : 'custom-modal-btn-confirm'}`;
+      
+      // Store callback
+      currentModalCallback = options.onConfirm || null;
+      
+      // Show/hide cancel button
+      if (options.showCancel === false) {
+        cancelBtn.style.display = 'none';
+      } else {
+        cancelBtn.style.display = 'block';
+      }
+      
+      // Show modal
+      modal.classList.add('show');
+    }
+
+    function hideCustomModal() {
+      const modal = document.getElementById('customModal');
+      modal.classList.remove('show');
+      currentModalCallback = null;
+    }
+
+    function confirmCustomModal() {
+      if (currentModalCallback) {
+        currentModalCallback();
+      }
+      hideCustomModal();
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('customModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        hideCustomModal();
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        hideCustomModal();
+      }
+    });
+
+    // Replace all alert() calls with custom modal
+    window.alert = function(message) {
+      showCustomModal({
+        type: 'info',
+        title: 'Informasi',
+        message: message,
+        icon: 'ℹ️',
+        confirmText: 'OK',
+        showCancel: false,
+        onConfirm: () => {}
+      });
+    };
+
+    // Replace all confirm() calls with custom modal
+    window.confirm = function(message) {
+      return new Promise((resolve) => {
+        showCustomModal({
+          type: 'warning',
+          title: 'Konfirmasi',
+          message: message,
+          icon: '⚠️',
+          confirmText: 'Ya',
+          onConfirm: () => resolve(true),
+          onCancel: () => resolve(false)
+        });
+      });
+    };
+  </script>
+  </div>
+</body>
+</html>

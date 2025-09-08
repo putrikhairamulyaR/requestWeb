@@ -1,0 +1,7 @@
+*.env
+node_modules
+docker-compose.yml
+.env.test
+*.crt
+*.pem
+private.key
