@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.use(session({
-    secret: "1234", // sebaiknya pakai process.env.SESSION_SECRET
+    secret: process.env.SESSION_SECRET, // sebaiknya pakai process.env.SESSION_SECRET
     resave: false,
     saveUninitialized: true,
     cookie: { 

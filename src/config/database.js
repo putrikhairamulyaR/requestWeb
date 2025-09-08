@@ -4,11 +4,11 @@ const dbTest = 'db_test';
 const fs = require('fs');
 // 2. Definisikan konfigurasi dari environment variables
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  port: Number(process.env.DB_PORT || 3306),
+  port: Number(process.env.DB_PORT),
   waitForConnections: true,
   connectionLimit: 50,
   queueLimit: 0,
@@ -29,7 +29,7 @@ const dbConfigTest = {
 
 // 3. Buat connection pool berdasarkan konfigurasi
 //const pool = mysql.createPool(dbConfig);
-const pool = mysql.createPool(dbConfigTest);
+const pool = mysql.createPool(dbConfig);
 // 4. Tambahkan kembali fungsi untuk mengetes koneksi
 /**
  * Memverifikasi koneksi ke database.
