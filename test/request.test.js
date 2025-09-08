@@ -13,12 +13,18 @@ describe('Full Integration Tests', () => {
 
     const testUserNip = 400087;
     const testUserPassword = '123';
+    const secondTestUserNip = 400090; 
     let validToken;
+    let secondValidToken;
+    
 
     // Hook ini berjalan SEKALI sebelum semua tes dimulai.
     beforeAll(async () => {
         const loginResult = await authService.loginUser(testUserNip, testUserPassword);
         validToken = loginResult.token;
+
+        const loginResult2 = await authService.loginUser(secondTestUserNip, testUserPassword);
+        secondValidToken = loginResult2.token;
     });
 
     // Hook ini berjalan SEKALI setelah semua tes selesai.
@@ -119,6 +125,35 @@ describe('Full Integration Tests', () => {
             //console.log(result.failed);
             expect(result.failed).toHaveLength(1);
             expect(result.failed[0].reason).toContain('Kuota libur penuh');
+        });
+
+        test('should handle race conditions by allowing only one user to claim the last spot', async () => {
+            const raceDate = '2025-12-20';
+            
+            const otherNips = [400091, 400092]; 
+            for (const nip of otherNips) {
+                await pool.query("INSERT INTO request (timestamp, nip, jenis_pengajuan, status_pengajuan, tanggal, tanggal_lama) VALUES (NOW(), ?, 'libur', 'Pengajuan Pertama', ?, NULL)", [nip,raceDate]);
+            }
+
+            // Eksekusi: Dua pengguna mencoba mengajukan slot terakhir secara bersamaan
+            const formData = { jumlahLibur: '1', tanggalLiburContainer_tanggal1: raceDate };
+            
+            const promise1 = formService.processPengajuan(validToken, formData);
+            const promise2 = formService.processPengajuan(secondValidToken, formData);
+
+            // Jalankan kedua promise secara konkuren
+            const [result1, result2] = await Promise.all([promise1, promise2]);
+            
+            // Verifikasi: Hanya salah satu yang boleh berhasil
+            const totalSuccess = result1.success.length + result2.success.length;
+            const totalFailed = result1.failed.length + result2.failed.length;
+
+            expect(totalSuccess).toBe(1); // Hanya satu yang berhasil
+            expect(totalFailed).toBe(1);  // Hanya satu yang gagal
+
+            // Verifikasi akhir di database: total pengajuan untuk tanggal itu harus 3, tidak lebih.
+            const [finalCount] = await pool.query("SELECT COUNT(*) as total FROM request WHERE jenis_pengajuan = 'libur' AND tanggal = ?", [raceDate]);
+            expect(finalCount[0].total).toBe(3);
         });
     });
 });
