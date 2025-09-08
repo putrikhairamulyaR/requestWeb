@@ -54,6 +54,7 @@ function verifyUserToken(token) {
   if (!token) {
     return null;
   }
+  
   try {
     // Coba verifikasi token menggunakan kunci rahasia
     const decodedPayload = jwt.verify(token, process.env.JWT_SECRET);

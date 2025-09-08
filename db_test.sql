@@ -61,7 +61,7 @@ CREATE TABLE `request` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Contoh data request
-INSERT INTO `request` (`timestamp`, `nip`, `jenis_pengajuan`, `status_pengajuan`, `tanggal`, `tanggal_lama`)
+/*INSERT INTO `request` (`timestamp`, `nip`, `jenis_pengajuan`, `status_pengajuan`, `tanggal`, `tanggal_lama`)
 VALUES 
 (NOW(), 400087, 'Cuti Lainnya', 'Pengajuan Pertama', '2025-09-10', NULL),
 (NOW(), 400090, 'Libur', 'Pengajuan Pertama', '2025-09-11', NULL),
@@ -71,4 +71,4 @@ VALUES
 (NOW(), 400090, 'Libur', 'Pengajuan Pertama', '2025-09-12',NULL),
 (NOW(), 400091, 'Libur', 'Pengajuan Pertama', '2025-09-12',NULL),
 (NOW(), 400092, 'Libur', 'Pengajuan Pertama', '2025-09-12',NULL),
-(NOW(), 400087, 'Cuti', 'Pengajuan Pertama', '2025-09-13',NULL);
+(NOW(), 400087, 'Cuti', 'Pengajuan Pertama', '2025-09-13',NULL);*/
