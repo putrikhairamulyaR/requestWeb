@@ -1,10 +1,14 @@
+version: "3.9"
+
 services:
   db:
     image: mysql:8.0
     container_name: requestweb-mysql
     environment:
+
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD} # Mengambil dari file .env
       MYSQL_DATABASE: ${DB_NAME}           # Mengambil dari file .env
+
     ports:
       - "3306:3306"
     restart: always
@@ -12,7 +16,7 @@ services:
       - db_data:/var/lib/mysql
       - ./web.sql:/docker-entrypoint-initdb.d/init.sql:z
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p@Ori2305"]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -25,6 +29,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
       
     environment:
       NODE_ENV: production
@@ -33,6 +38,7 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
+
       DB_PORT: 3306
       JWT_SECRET: ${JWT_SECRET}
       
@@ -42,3 +48,5 @@ services:
 
 volumes:
   db_data:
+
+
