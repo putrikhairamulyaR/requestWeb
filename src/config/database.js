@@ -29,7 +29,7 @@ const dbConfigTest = {
 
 // 3. Buat connection pool berdasarkan konfigurasi
 //const pool = mysql.createPool(dbConfig);
-const pool = mysql.createPool(dbConfig);
+const pool = mysql.createPool(dbConfigTest);
 // 4. Tambahkan kembali fungsi untuk mengetes koneksi
 /**
  * Memverifikasi koneksi ke database.

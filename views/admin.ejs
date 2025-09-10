@@ -474,6 +474,7 @@
                 
                 console.log("Payload yang dikirim ke API generate-schedule:", JSON.stringify(payload, null, 2));
 
+
                 return fetch('http://localhost:5001/generate-schedule', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
