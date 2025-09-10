@@ -5,7 +5,7 @@ services:
     image: mysql:8.0
     container_name: requestweb-mysql
     environment:
-
+      
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD} # Mengambil dari file .env
       MYSQL_DATABASE: ${DB_NAME}           # Mengambil dari file .env
 
@@ -16,7 +16,7 @@ services:
       - db_data:/var/lib/mysql
       - ./web.sql:/docker-entrypoint-initdb.d/init.sql:z
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p@Ori2305"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 3s
       retries: 20

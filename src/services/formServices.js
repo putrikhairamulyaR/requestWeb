@@ -80,17 +80,17 @@ async function processPengajuan(token, formData) {
     }
 
     const allDates = {
-      libur: extractDates("tanggalLiburContainer", formData.jumlahLibur),
-      cuti: extractDates("tanggalCutiContainer", formData.jumlahCuti),
-      "cuti lainnya": extractDates("tanggalCutiLainContainer", formData.jumlahCutiLain)
+      Libur: extractDates("tanggalLiburContainer", formData.jumlahLibur),
+      Cuti: extractDates("tanggalCutiContainer", formData.jumlahCuti),
+      "Cuti Lainnya": extractDates("tanggalCutiLainContainer", formData.jumlahCutiLain)
     };
 
     for (const jenis in allDates) {
       for (const tanggal of allDates[jenis]) {
         try {
           let quotaKey =
-            jenis === "libur" ? "LIBUR" :
-            jenis === "cuti" ? "CUTI" : "CUTI_LAINNYA";
+            jenis === "Libur" ? "LIBUR" :
+            jenis === "Cuti" ? "CUTI" : "CUTI_LAINNYA";
           const maxQuota = CONFIG.QUOTA[quotaKey];
 
           // Mulai transaksi
@@ -113,7 +113,7 @@ async function processPengajuan(token, formData) {
           }
 
           // 🔹 Cek kuota global dengan lock
-          if (jenis === "libur") {
+          if (jenis === "Libur") {
             const totalOnDate = await Request.countByJenisTanggalForUpdate(connection, jenis, tanggal);
             if (totalOnDate >= 3) {
               await connection.rollback();
