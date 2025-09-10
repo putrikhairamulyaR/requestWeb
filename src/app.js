@@ -31,16 +31,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-app.use(session({
-    secret: "1234", // sebaiknya pakai process.env.SESSION_SECRET
-    resave: false,
-    saveUninitialized: true,
-    cookie: { 
-        secure: false, // Set to true if using HTTPS
-        httpOnly: false, // Allow JavaScript access for debugging
-        sameSite: 'lax' // Allow cross-site requests
-    }
-}));
+app.use(
+  session({
+    name: "session",
+    keys: [process.env.SESSION_SECRET || "default_secret_key"],
+    maxAge: 24 * 60 * 60 * 1000, // 1 hari
+  })
+);
 
 // =================================================================
 // ROUTES
