@@ -455,24 +455,16 @@ async function resetPengajuan(req, res) {
     // Delete only libur and cuti lainnya requests (not cuti tahunan)
     const deleteRequestsQuery = `
       DELETE FROM request 
-      WHERE jenis_pengajuan IN ('Libur', 'Cuti Lainnya')
+      WHERE jenis_pengajuan IN ('Libur', 'Cuti Lainnya','cuti','libur','cuti lainnya')
     `;
     const [deleteResult] = await pool.query(deleteRequestsQuery);
     console.log('Delete requests result:', deleteResult);
     
-    // Reset cutiTerpakai to 0 for all users
-    const resetQuery = `
-      UPDATE useraccounts 
-      SET cutiTerpakai = 0 
-      WHERE cutiTerpakai > 0
-    `;
-    const [result] = await pool.query(resetQuery);
-    console.log('Reset result:', result);
+    
     
     res.json({ 
       success: true, 
       message: 'Reset pengajuan berhasil! Jatah cuti CAP dan libur telah dikembalikan ke full. Cuti tahunan tidak direset.',
-      affectedUsers: result.affectedRows,
       deletedRequests: deleteResult.affectedRows,
       backupData: backupData // Send backup data for potential undo
     });
