@@ -2,22 +2,27 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Registrasi dan Login</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f7f7f7;
       margin: 0; padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      /* --- BACKGROUND IMAGE ADDED --- */
+      background: url("/image/bg.jpg") no-repeat center center fixed;
+      background-size: cover;       /* supaya memenuhi layar */
+      background-position: center;  /* biar center */
+      background-repeat: no-repeat; /* jangan diulang */
     }
     .container {
       background: white;
-      max-width: 400px;
+      max-width: 600px;
+      height: 250px;
       width: 90%; 
       padding: 20px 25px 30px;
       border-radius: 10px;
@@ -31,7 +36,7 @@
       margin: 8px 0 12px;
       border: 1.8px solid #f5c6cb;
       border-radius: 5px;
-      font-size: 16px;
+      font-size: 20px;
       box-sizing: border-box;
     }
     button {
@@ -41,7 +46,7 @@
       border: none;
       color: white;
       font-weight: bold;
-      font-size: 18px;
+      font-size: 20px;
       cursor: pointer;
       border-radius: 70px;
       margin-top: 10px;
@@ -79,57 +84,55 @@
       font-size: 30px;
     }
 
-/* -- TAMBAHAN BUAT HP LEBIH BESAR SEKALI -- */
-@media only screen and (max-width: 1080px) {
-  body {
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    background: #f7f7f7;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .container {
-    width: 90%;
-    max-width: 400px;
-    padding: 20px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    text-align: center;
-  }
-
-  h2 {
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-  }
-
-  input, select {
-    font-size: 1.1rem;
-    padding: 12px;
-    margin: 8px 0 12px;
-  }
-
-  button {
-    font-size: 1.2rem;
-    padding: 12px 0;
-    border-radius: 70px;
-  }
-
-  #togglePassword {
-    right: 15px;
-    font-size: 20px;
-  }
-
-  .message {
-    font-size: 1rem;
-    padding: 10px;
-  }
-}
-
-/* -- AKHIR TAMBAHAN BUAT HP LEBIH BESAR SEKALI -- */
+    /* Styles for tablets and small laptops */
+    @media only screen and (max-width: 1080px) {
+      .container {
+        padding: 20px;
+      }
+      h2 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+      }
+      input, select {
+        font-size: 1.1rem;
+        padding: 12px;
+        margin: 8px 0 12px;
+      }
+      button {
+        font-size: 1.2rem;
+        padding: 12px 0;
+        border-radius: 70px;
+      }
+      #togglePassword {
+        right: 15px;
+        font-size: 20px;
+      }
+      .message {
+        font-size: 1rem;
+        padding: 10px;
+      }
+    }
+    
+    /* --- NEW STYLES FOR SMALLER PHONES --- */
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px 15px; /* Reduce side padding */
+        width: 85%; /* Use a bit more screen width */
+      }
+      h2 {
+        font-size: 1.5rem; /* Make heading smaller */
+      }
+      input, select, button {
+        font-size: 1rem; /* Make text in form fields smaller */
+        padding: 10px;
+      }
+      button {
+        width: 90%;
+      }
+      #togglePassword {
+        font-size: 18px; /* Adjust icon size */
+      }
+    }
 
   </style>
 </head>
@@ -160,8 +163,7 @@
   </div>
 
   <script>
-    // SATU-SATUNYA JAVASCRIPT YANG TERSISA HANYA UNTUK EFEK VISUAL (UI)
-    // Logika untuk menampilkan/menyembunyikan password
+    // Visual effect script for toggling password visibility
     (function(){
       const toggle = document.getElementById('togglePassword');
       if (!toggle) return;

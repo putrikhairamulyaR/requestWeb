@@ -3,9 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <title>Dashboard Jadwal Pegawai</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     body { font-family: Arial, sans-serif; margin: 0; }
-    .navbar { background: #007BFF; color: #fff; padding: 10px 20px; display: flex; }
+    .navbar { 
+      background: #007BFF; 
+      color: #fff; 
+      padding: 10px 20px; 
+      display: flex; 
+      justify-content: space-between; /* Membuat item terpisah */
+      align-items: center; 
+    }
     .container { padding: 20px; }
     table { border-collapse: collapse; font-size: 14px; width: 100%; }
     th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: center; }
@@ -94,24 +102,38 @@
       font-weight: bold;
     }
     
-    .modal-btn-primary {
-      background-color: #007bff;
+    .modal-btn-primary { background-color: #007bff; color: white; }
+    .modal-btn-danger { background-color: #dc3545; color: white; }
+    .modal-btn-success { background-color: #28a745; color: white; }
+    .modal-btn:hover { opacity: 0.8; }
+
+    /* PERUBAHAN: Style untuk Logout Dropdown */
+    .navbar-right a {
       color: white;
+      text-decoration: none;
+      cursor: pointer;
     }
-    
-    .modal-btn-danger {
-      background-color: #dc3545;
-      color: white;
+    .navbar-right a:hover {
+      text-decoration: underline;
     }
-    
-    .modal-btn-success {
-      background-color: #28a745;
-      color: white;
+    .navbar-right i {
+      margin-right: 5px;
     }
-    
-    .modal-btn:hover {
-      opacity: 0.8;
+
+    /* PERUBAHAN: Style untuk Container Chart */
+    .chart-container {
+      display: flex;
+      gap: 20px;
+      margin-top: 25px;
+      width: 100%;
     }
+    .chart-wrapper {
+      flex: 1;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -119,6 +141,9 @@
 <body>
   <div class="navbar">
     <div>Dashboard Admin</div>
+    <div class="navbar-right">
+      <a id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
   </div>
   <div class="container">
     <div>
@@ -160,7 +185,7 @@
       </div>
     </div>
 
-    <!-- Below left table: Holiday table and Demand configuration side by side -->
+
     <div style="display:flex; gap:20px; margin-top:15px;">
       <div class="demand-table-container" style="flex: 1;">
         <h3 style="margin-bottom: 10px;">Tanggal Merah & Libur Bersama</h3>
@@ -194,18 +219,20 @@
         </table>
       </div>
     </div>
+    <div class="chart-container">
+      <div class="chart-wrapper" id="requestChartContainer"></div>
+      <div class="chart-wrapper" id="shiftChartContainer"></div>
+    </div>
     
     <div style="margin-top:15px;">
       <button onclick="generateJadwal()">Generate Jadwal</button>
       <button onclick="downloadExcel()" style="background:#6c757d;">Download Excel</button>
-      <button id="pushToSheet" style="background:#0018F9;">Apply Jadwal Ke Sheet</button>
       <button onclick="resetPengajuan()" style="background:#dc3545;">Reset Pengajuan</button>
       <button id="undoResetBtn" onclick="undoReset()" style="background:#ffc107; color:#000; display:none;">Undo Reset</button>
       <button onclick="downloadRequestExcel()" style="background:#17a2b8;">Download Request</button>
     </div>
   </div>
 
-  <!-- Modal for notifications -->
   <div id="notificationModal" class="modal">
     <div class="modal-content">
       <div class="modal-header" id="modalHeader">Notifikasi</div>
@@ -216,7 +243,6 @@
     </div>
   </div>
 
-  <!-- Modal for confirmation -->
   <div id="confirmModal" class="modal">
     <div class="modal-content">
       <div class="modal-header" id="confirmHeader">Konfirmasi</div>
@@ -295,6 +321,8 @@
           dataPengajuan = Array.isArray(data) ? data : [];
           renderLeftTable();
           markSelectedDates();
+          // PERUBAHAN 4: Memanggil fungsi untuk menggambar chart pengajuan
+          drawRequestChart();
         })
         .catch(error => {
           console.error('Error fetching pengajuan data:', error);
@@ -426,8 +454,6 @@
 
         alert('Mengambil data tanggal merah dan memulai proses generate...');
 
-        // --- PERBAIKAN DIMULAI DI SINI ---
-        // Ganti google.script.run dengan fetch ke API Anda sendiri
         fetch('/api/tanggal-merah')
             .then(response => {
                 if (!response.ok) {
@@ -436,8 +462,6 @@
                 return response.json();
             })
             .then(holidaysFromServer => {
-                // 'holidaysFromServer' adalah array tanggal merah dari backend Anda
-                // Pastikan formatnya adalah array of strings ["YYYY-MM-DD", ...]
                 const holidays = holidaysFromServer.map(h => h.tanggal.split('T')[0]);
 
                 const payload = {
@@ -450,7 +474,6 @@
                 
                 console.log("Payload yang dikirim ke API generate-schedule:", JSON.stringify(payload, null, 2));
 
-                // Lanjutkan dengan mengirim payload ke API generate
                 return fetch('http://localhost:5001/generate-schedule', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -459,7 +482,6 @@
             })
             .then(res => {
                 if (!res.ok) {
-                    // Coba baca pesan error dari server jika ada
                     return res.json().then(errData => {
                         throw new Error(errData.message || res.statusText);
                     });
@@ -476,7 +498,6 @@
                 console.error(err);
                 alert('Terjadi kesalahan: ' + err.message);
             });
-        // --- AKHIR DARI PERBAIKAN ---
     }
 
     function pollStatus(checkUrl) {
@@ -529,9 +550,8 @@
           const cell = document.querySelector(`td[data-nip="${nip}"][data-tgl="${ddmmy}"]`);
           if (cell && !cell.textContent) {
             let display;
-            // **PERUBAHAN KUNCI DI SINI**
             if (shift.toLowerCase() === 'libur') {
-              display = 'L'; // Libur otomatis dari server = L
+              display = 'L';
             } else if (shift.toLowerCase() === 'cuti') {
               display = 'C';
             } else {
@@ -545,6 +565,8 @@
           }
         });
       });
+      // PERUBAHAN 5: Panggil fungsi untuk menggambar chart distribusi shift
+      drawShiftChart(scheduleData);
     }
 
     function downloadExcel() {
@@ -585,160 +607,76 @@
       XLSX.writeFile(wb, `Jadwal ${monthName} ${year}.xlsx`);
     }
 
-    document.getElementById('pushToSheet').addEventListener('click', () => {
-      const tbl = document.getElementById('right-table');
-      if (!tbl) return alert('Jadwal belum ada. Generate dulu.');
-      const allRows = Array.from(tbl.querySelectorAll('tr')).map(tr => Array.from(tr.children).map(cell => cell.textContent.trim()));
-      
-      google.script.run
-        .withSuccessHandler(res => {
-          if (res.success) { alert('✅ Jadwal berhasil ditulis ke sheet "JadwalOutput".'); } 
-          else { alert('❌ Gagal: ' + res.message); }
-        })
-        .withFailureHandler(err => { alert('❌ Server error: ' + err.message); })
-        .writeScheduleToSheet(allRows);
-    });
+    // Reset, Undo, Download Request, dan Holiday functions tetap sama
+    let pendingAction = null;
+    let lastResetBackup = null;
 
-    // Reset pengajuan function
     function resetPengajuan() {
       showConfirmModal(
         'Konfirmasi Reset', 
         'Apakah Anda yakin ingin mereset pengajuan? Jatah cuti CAP dan libur akan dikembalikan ke full, tapi cuti tahunan tidak akan berubah.',
         () => {
-          console.log('Resetting pengajuan...');
-          fetch('/api/reset-pengajuan', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({})
-          })
-          .then(response => {
-            console.log('Reset response status:', response.status);
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-          })
+          fetch('/api/reset-pengajuan', { method: 'POST' })
+          .then(res => res.ok ? res.json() : Promise.reject(res))
           .then(data => {
-            console.log('Reset response data:', data);
             if (data.success) {
-              // Store backup data for potential undo
               lastResetBackup = data.backupData;
               showModal('Berhasil', data.message + ' (Undo tersedia)');
-              fetchPengajuan(); // Refresh data
-              updateUndoButton(); // Show undo button
+              fetchPengajuan();
+              updateUndoButton();
             } else {
               showModal('Error', 'Gagal reset pengajuan: ' + data.error);
             }
-          })
-          .catch(error => {
-            console.error('Error resetting pengajuan:', error);
-            showModal('Error', 'Server error: ' + error.message);
-          });
+          }).catch(err => showModal('Error', 'Server error: ' + err.message));
         }
       );
     }
 
-    // Undo reset function
     function undoReset() {
-      if (!lastResetBackup) {
-        showModal('Peringatan', 'Tidak ada data backup untuk di-undo.');
-        return;
-      }
-
+      if (!lastResetBackup) return showModal('Peringatan', 'Tidak ada data backup untuk di-undo.');
       showConfirmModal(
         'Konfirmasi Undo', 
         'Apakah Anda yakin ingin mengembalikan pengajuan yang telah direset?',
         () => {
-          console.log('Undoing reset...');
           fetch('/api/undo-reset-pengajuan', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ backupData: lastResetBackup })
           })
-          .then(response => {
-            console.log('Undo response status:', response.status);
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-          })
+          .then(res => res.ok ? res.json() : Promise.reject(res))
           .then(data => {
-            console.log('Undo response data:', data);
             if (data.success) {
               showModal('Berhasil', data.message);
-              fetchPengajuan(); // Refresh data
-              lastResetBackup = null; // Clear backup
-              updateUndoButton(); // Hide undo button
+              fetchPengajuan();
+              lastResetBackup = null;
+              updateUndoButton();
             } else {
               showModal('Error', 'Gagal undo reset: ' + data.error);
             }
-          })
-          .catch(error => {
-            console.error('Error undoing reset:', error);
-            showModal('Error', 'Server error: ' + error.message);
-          });
+          }).catch(err => showModal('Error', 'Server error: ' + err.message));
         }
       );
     }
-
-    // Update undo button visibility
+    
     function updateUndoButton() {
-      const undoButton = document.getElementById('undoResetBtn');
-      if (undoButton) {
-        undoButton.style.display = lastResetBackup ? 'inline-block' : 'none';
-      }
+      document.getElementById('undoResetBtn').style.display = lastResetBackup ? 'inline-block' : 'none';
     }
 
-    // Download request Excel function
     function downloadRequestExcel() {
-      if (!dataPengajuan.length) {
-        return alert('Tidak ada data pengajuan untuk didownload.');
-      }
-      
-      const header = ['NIP', 'Nama', 'Jenis', 'Tanggal Request', 'Status'];
-      const sheetData = [header];
-      
-      dataPengajuan.forEach(p => {
-        const rowData = [
-          p.nip,
-          p.nama,
-          p.jenis,
-          p.request.join(', '),
-          p.status
-        ];
-        sheetData.push(rowData);
-      });
-      
+      if (!dataPengajuan.length) return alert('Tidak ada data pengajuan untuk didownload.');
+      const sheetData = [['NIP', 'Nama', 'Jenis', 'Tanggal Request', 'Status'], ...dataPengajuan.map(p => [p.nip, p.nama, p.jenis, p.request.join(', '), p.status])];
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(sheetData);
-      
-      // Set column widths
-      const colWidths = [
-        { wch: 15 }, // NIP
-        { wch: 25 }, // Nama
-        { wch: 15 }, // Jenis
-        { wch: 30 }, // Tanggal Request
-        { wch: 15 }  // Status
-      ];
-      ws['!cols'] = colWidths;
-      
+      ws['!cols'] = [{ wch: 15 }, { wch: 25 }, { wch: 15 }, { wch: 30 }, { wch: 15 }];
       const monthName = document.getElementById('bulan').options[document.getElementById('bulan').selectedIndex].text;
       const year = new Date().getFullYear();
       XLSX.utils.book_append_sheet(wb, ws, 'Request Pengajuan');
       XLSX.writeFile(wb, `Request Pengajuan ${monthName} ${year}.xlsx`);
     }
 
-    // Holiday management functions
     let holidayData = [];
-    let pendingAction = null;
-    let lastResetBackup = null; // Store backup data for undo
 
-    // Modal functions
-    function showModal(title, message, type = 'info') {
+    function showModal(title, message) {
       document.getElementById('modalHeader').textContent = title;
       document.getElementById('modalBody').textContent = message;
       document.getElementById('notificationModal').style.display = 'block';
@@ -756,10 +694,8 @@
     }
 
     function confirmAction() {
-      if (pendingAction) {
-        pendingAction();
-        pendingAction = null;
-      }
+      if (pendingAction) pendingAction();
+      pendingAction = null;
       document.getElementById('confirmModal').style.display = 'none';
     }
 
@@ -768,264 +704,163 @@
       document.getElementById('confirmModal').style.display = 'none';
     }
 
-    // Close modals when clicking outside
     window.onclick = function(event) {
-      const notificationModal = document.getElementById('notificationModal');
-      const confirmModal = document.getElementById('confirmModal');
-      if (event.target === notificationModal) {
-        closeModal();
-      }
-      if (event.target === confirmModal) {
-        cancelAction();
-      }
+      if (event.target == document.getElementById('notificationModal')) closeModal();
+      if (event.target == document.getElementById('confirmModal')) cancelAction();
     }
 
     function loadHolidays() {
-      console.log('Loading holidays data from database...');
-      
-      // Clear existing data first
-      holidayData = [];
-      renderHolidayTable();
-      
       fetch('/api/tanggal-merah')
-        .then(response => {
-          console.log('Response status:', response.status);
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          console.log('Holidays data received:', data);
-          if (data.error) {
-            console.error('Error loading holidays:', data.error);
-            showModal('Error', 'Gagal memuat data tanggal merah: ' + data.error);
-            return;
-          }
-          
-          holidayData = Array.isArray(data) ? data : [];
-          console.log('Setting holidayData to:', holidayData);
-          renderHolidayTable();
-        })
-        .catch(error => {
-          console.error('Error fetching holidays data:', error);
-          showModal('Error', 'Gagal memuat data tanggal merah: ' + error.message);
-        });
+      .then(res => res.ok ? res.json() : Promise.reject(res))
+      .then(data => {
+        holidayData = Array.isArray(data) ? data : [];
+        renderHolidayTable();
+      }).catch(err => showModal('Error', 'Gagal memuat tanggal merah: ' + err.message));
     }
 
     function renderHolidayTable() {
       const tbody = document.getElementById('holiday-body');
       tbody.innerHTML = '';
-      
-      console.log('Rendering holiday table with data:', holidayData);
-      
       if (!holidayData.length) {
         tbody.innerHTML = '<tr><td colspan="2">Tidak ada tanggal merah</td></tr>';
         return;
       }
-      
       holidayData.forEach((holiday, index) => {
         const tr = document.createElement('tr');
-        // Format date to DD-MM-YYYY for display
         const date = new Date(holiday.tanggal);
-        const formattedDate = date.toLocaleDateString('id-ID', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric'
-        });
-        
-        tr.innerHTML = `
-          <td>${formattedDate}</td>
-          <td>
-            <button onclick="deleteHoliday(${index})" style="background:#dc3545; padding: 4px 8px; font-size: 12px;">Hapus</button>
-          </td>
-        `;
+        const formattedDate = date.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        tr.innerHTML = `<td>${formattedDate}</td><td><button onclick="deleteHoliday(${index})" style="background:#dc3545; padding: 4px 8px; font-size: 12px;">Hapus</button></td>`;
         tbody.appendChild(tr);
       });
     }
 
     function addHoliday() {
       const dateInput = document.getElementById('newHolidayDate').value;
+      if (!dateInput) return showModal('Peringatan', 'Mohon isi tanggal hari libur.');
+      if (holidayData.some(h => h.tanggal.startsWith(dateInput))) return showModal('Peringatan', 'Tanggal ini sudah ada.');
       
-      if (!dateInput) {
-        showModal('Peringatan', 'Mohon isi tanggal hari libur.');
-        return;
-      }
-      
-      // Use the date input directly (it's already in YYYY-MM-DD format)
-      const formattedDate = dateInput;
-      
-      console.log('Date input:', dateInput);
-      console.log('Formatted date:', formattedDate);
-      
-      // Check if date already exists
-      if (holidayData.some(h => h.tanggal === formattedDate)) {
-        showModal('Peringatan', 'Tanggal ini sudah ada dalam daftar.');
-        return;
-      }
-      
-      console.log('Adding holiday with date:', formattedDate);
       fetch('/api/tanggal-merah', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ tanggal: formattedDate })
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ tanggal: dateInput })
       })
-      .then(response => {
-        console.log('Add response status:', response.status);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
+      .then(res => res.ok ? res.json() : Promise.reject(res))
       .then(data => {
-        console.log('Add response data:', data);
-        if (data.success) {
+        if(data.success) {
           showModal('Berhasil', 'Tanggal merah berhasil ditambahkan.');
           document.getElementById('newHolidayDate').value = '';
-          loadHolidays(); // Refresh table
+          loadHolidays();
         } else {
-          showModal('Error', 'Gagal menambahkan tanggal merah: ' + data.error);
+          showModal('Error', 'Gagal menambahkan: ' + data.error);
         }
-      })
-      .catch(error => {
-        console.error('Error adding holiday:', error);
-        showModal('Error', 'Server error: ' + error.message);
-      });
+      }).catch(err => showModal('Error', 'Server error: ' + err.message));
     }
 
     function deleteHoliday(index) {
       const holiday = holidayData[index];
-      console.log('Holiday to delete:', holiday);
-      
-      // Use the original date from database (should be in YYYY-MM-DD format)
-      let dbDate = holiday.tanggal;
-      
-      // Ensure the date is in YYYY-MM-DD format
-      if (dbDate && typeof dbDate === 'string') {
-        // If it has timezone info, extract just the date part
-        if (dbDate.includes('T')) {
-          dbDate = dbDate.split('T')[0];
+      let dbDate = holiday.tanggal.split('T')[0];
+      const displayDate = new Date(dbDate).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      showConfirmModal('Konfirmasi Hapus', `Hapus tanggal merah pada ${displayDate}?`, () => {
+        fetch('/api/tanggal-merah', {
+          method: 'DELETE',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ tanggal: dbDate })
+        })
+        .then(res => res.ok ? res.json() : Promise.reject(res))
+        .then(data => {
+          if (data.success) {
+            showModal('Berhasil', 'Tanggal merah berhasil dihapus.');
+            loadHolidays();
+          } else {
+            showModal('Error', 'Gagal menghapus: ' + data.error);
+          }
+        }).catch(err => showModal('Error', 'Server error: ' + err.message));
+      });
+    }
+
+    // PERUBAHAN 6: Fungsi-fungsi untuk menggambar chart
+    google.charts.load('current', {'packages':['corechart', 'line']});
+    google.charts.setOnLoadCallback(drawRequestChart); // Gambar chart pengajuan saat library siap
+
+    function drawRequestChart() {
+        if (dataPengajuan.length === 0) {
+            document.getElementById('requestChartContainer').innerHTML = '<h3>Frekuensi Pengajuan per Tanggal</h3><p>Tidak ada data pengajuan untuk ditampilkan.</p>';
+            return;
         }
-        // If it's already in YYYY-MM-DD format, use it directly
-      } else {
-        showModal('Error', 'Data tanggal tidak valid');
-        return;
-      }
-      
-      console.log('Date to delete (normalized):', dbDate);
-      
-      // Format for display
-      const displayDate = new Date(dbDate).toLocaleDateString('id-ID', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      });
-      
-      showConfirmModal(
-        'Konfirmasi Hapus', 
-        `Hapus tanggal merah pada ${displayDate}?`,
-        () => {
-          console.log('Deleting holiday with date:', dbDate);
-          fetch('/api/tanggal-merah', {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({ tanggal: dbDate })
-          })
-          .then(response => {
-            console.log('Delete response status:', response.status);
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log('Delete response data:', data);
-            if (data.success) {
-              showModal('Berhasil', 'Tanggal merah berhasil dihapus.');
-              loadHolidays(); // Refresh table
-            } else {
-              showModal('Error', 'Gagal menghapus tanggal merah: ' + data.error);
-            }
-          })
-          .catch(error => {
-            console.error('Error deleting holiday:', error);
-            showModal('Error', 'Server error: ' + error.message);
-          });
+
+        const dateCounts = {};
+        dataPengajuan.forEach(p => {
+            p.request.forEach(dateStr => {
+                const [day, month, year] = dateStr.split('-');
+                const formattedDate = `${year}-${month}-${day}`; // Format YYYY-MM-DD untuk sorting
+                dateCounts[formattedDate] = (dateCounts[formattedDate] || 0) + 1;
+            });
+        });
+
+        const sortedDates = Object.entries(dateCounts).sort((a, b) => new Date(a[0]) - new Date(b[0]));
+        
+        const data = new google.visualization.DataTable();
+        data.addColumn('string', 'Tanggal');
+        data.addColumn('number', 'Jumlah Pengajuan');
+        data.addRows(sortedDates.map(([date, count]) => {
+            const [year, month, day] = date.split('-');
+            return [`${day}-${month}`, count]; // Format DD-MM untuk label
+        }));
+
+        const options = {
+            title: 'Frekuensi Pengajuan per Tanggal',
+            legend: { position: 'none' },
+            hAxis: { title: 'Tanggal' },
+            vAxis: { title: 'Jumlah Pengajuan', viewWindow: { min: 0 } },
+            colors: ['#007BFF']
+        };
+
+        const chart = new google.visualization.LineChart(document.getElementById('requestChartContainer'));
+        chart.draw(data, options);
+    }
+
+    function drawShiftChart(scheduleData) {
+        if (!scheduleData || Object.keys(scheduleData).length === 0) {
+            document.getElementById('shiftChartContainer').innerHTML = '<h3>Distribusi Shift Hasil Generate</h3><p>Belum ada jadwal yang digenerate.</p>';
+            return;
         }
-      );
-    }
 
-    // Test DELETE method
-    function testDelete() {
-      console.log('Testing DELETE method...');
-      fetch('/api/test-delete', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ test: 'data' })
-      })
-      .then(response => {
-        console.log('Test DELETE response status:', response.status);
-        return response.json();
-      })
-      .then(data => {
-        console.log('Test DELETE response data:', data);
-      })
-      .catch(error => {
-        console.error('Test DELETE error:', error);
-      });
-    }
+        const shiftCounts = {};
+        const ignoredShifts = ['Libur', 'Cuti', 'LR', 'L', 'C', '-'];
+        Object.values(scheduleData).forEach(shifts => {
+            shifts.forEach(shift => {
+                if (!ignoredShifts.includes(shift)) {
+                    shiftCounts[shift] = (shiftCounts[shift] || 0) + 1;
+                }
+            });
+        });
 
-    // Test database connection
-    function testDatabase() {
-      console.log('Testing database connection...');
-      fetch('/api/test-db')
-      .then(response => {
-        console.log('Test DB response status:', response.status);
-        return response.json();
-      })
-      .then(data => {
-        console.log('Test DB response data:', data);
-      })
-      .catch(error => {
-        console.error('Test DB error:', error);
-      });
-    }
+        const data = new google.visualization.DataTable();
+        data.addColumn('string', 'Shift');
+        data.addColumn('number', 'Jumlah');
+        data.addRows(Object.entries(shiftCounts));
 
-    // Test getting holidays
-    function testGetHolidays() {
-      console.log('Testing get holidays...');
-      fetch('/api/tanggal-merah')
-      .then(response => {
-        console.log('Get holidays response status:', response.status);
-        return response.json();
-      })
-      .then(data => {
-        console.log('Get holidays response data:', data);
-      })
-      .catch(error => {
-        console.error('Get holidays error:', error);
-      });
+        const options = {
+            title: 'Distribusi Shift Hasil Generate',
+            is3D: true,
+        };
+
+        const chart = new google.visualization.PieChart(document.getElementById('shiftChartContainer'));
+        chart.draw(data, options);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       loadPegawai();
       renderDemandTable();
       loadHolidays();
-      
-      // Test methods on page load
-      setTimeout(() => {
-        testDatabase();
-        testGetHolidays();
-        testDelete();
-      }, 2000);
+      drawShiftChart(null); // Tampilkan chart kosong di awal
+
+      // PERUBAHAN 7: Event Listener untuk Logout
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        showConfirmModal('Konfirmasi Logout', 'Apakah Anda yakin ingin keluar?', () => {
+          window.location.href = '/logout';
+        });
+      });
     });
   </script>
 </body>
