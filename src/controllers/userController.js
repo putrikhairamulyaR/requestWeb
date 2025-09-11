@@ -495,12 +495,12 @@ async function undoResetPengajuan(req, res) {
         VALUES (?, ?, ?, ?, ?, ?)
       `;
       await pool.query(insertQuery, [
-        record.timestamp,
+        new Date(record.timestamp),
         record.nip,
         record.jenis_pengajuan,
         record.status_pengajuan,
-        record.tanggal,
-        record.tanggal_lama
+        new Date(record.tanggal),
+        record.tanggal_lama ? new Date(record.tanggal_lama) : null
       ]);
       restoredCount++;
     }
