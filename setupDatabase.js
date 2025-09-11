@@ -32,7 +32,7 @@ const dbConfigTest = {
 
 // 3. Buat connection pool berdasarkan konfigurasi
 //const pool = mysql.createPool(dbConfig);
-const pool = mysql.createPool(dbConfigTest);
+const pool = mysql.createPool(dbConfig);
 
 /**
  * Fungsi ini akan:
