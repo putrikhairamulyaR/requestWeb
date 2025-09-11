@@ -2,89 +2,35 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Form Pengajuan</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+  
+
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
   <style>
-    /* === semua style persis seperti yang kamu kasih === */
-     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      font-size: 18px;
-    }
-    .material-icons-outlined {
-      font-size: 40px !important;
-      margin-right: 15px;
-      color: #d80000;
-    }
-    .message {
-      margin-top: 18px;
-      padding: 14px 20px;
-      display: none;
-      border-radius: 6px;
-      word-break: break-word;
-      font-size: 17px;
-    }
-    .message.success {
-      background: #d4edda;
-      color: #155724;
-    }
-    .message.error {
-      background: #f8d7da;
-      color: #721c24;
-    }
-    .loading {
-      text-align: center;
-      color: #008000;
-      margin-top: 15px;
-      font-weight: bold;
-      font-size: 18px;
-      display: none;
-    }
-    .notice {
-      margin-top: 15px;
-      color: #d80000;
-      text-align: center;
-      font-size: 11px !important;
-      margin-bottom: 10px;
-    }
-    .loading-icon {
-      animation: spin 1s linear infinite;
-      vertical-align: middle;
-      margin-right: 6px;
-      color: #fff;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-      /* DESKTOP & LAPTOP STYLES */
-      body {
-        display: flex;
-        flex-direction: row;
-        margin: 0;
-        min-height: 100vh;
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        font-size: 18px;
-        overflow-x: hidden; /* Mencegah horizontal scroll */
-      }
-
-    /* === GAYA UNTUK TOP BAR BARU === */
-
-    /* Mengatur layout utama halaman */
+    /* === GAYA DASAR (UNTUK DESKTOP & LAYAR BESAR) === */
     body {
       display: flex;
       flex-direction: column;
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      font-size: 16px;
+      overflow-x: hidden;
     }
 
-    /* Gaya dasar Top Bar */
+    /* TOP BAR (NAVBAR) */
     .top-bar {
       width: 100%;
       background-color: #f8f8f8;
-      padding: 20px 30px;
+      padding: 18px 35px;
       border-bottom: 2px solid #ddd;
       display: flex;
       align-items: center;
@@ -92,737 +38,147 @@
       box-sizing: border-box;
     }
     .top-bar a {
-      font-size: 40px !important;
+      font-size: 18px;
+      font-weight: 500;
       color: #d80000;
       text-decoration: none;
       display: flex;
       align-items: center;
       transition: color .2s;
     }
-    .top-bar a:hover {
-      color: #d80000;
-    }
+    .top-bar a:hover { color: #a80000; }
     .top-bar .material-icons-outlined {
-        font-size: 40px !important;
-        margin-right: 8px;
+      font-size: 28px;
+      margin-right: 10px;
     }
 
-      /* Gaya Dropdown Menu */
-      .dropdown {
-        position: relative;
-        display: inline-block;
-      }
-      .dropdown .dropdown-toggle {
-        cursor: pointer;
-      }
-      #userNipDisplay {
-        margin: 0 5px;
-      }
-      .dropdown-menu {
-        display: none; /* Sembunyi */
-        position: absolute;
-        right: 0;
-        background-color: #ffffff;
-        min-width: 200px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        border-radius: 8px;
-        z-index: 100;
-        margin-top: 10px;
-        overflow: hidden;
-      }
-      .dropdown-menu a {
-        color: #333;
-        padding: 12px 18px;
-        font-size: 40px !important;
-      }
-      .dropdown-menu a:hover {
-        background-color: #f1f1f1;
-      }
-      .dropdown-menu.show {
-        display: block; /* Tampilkan */
-      }
+    /* DROPDOWN MENU */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown .dropdown-toggle { cursor: pointer; }
+    #userNipDisplay { margin: 0 8px; }
+    .dropdown-menu {
+      display: none; position: absolute; right: 0; background-color: #ffffff;
+      min-width: 220px; box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+      border-radius: 8px; z-index: 100; margin-top: 10px; overflow: hidden;
+    }
+    .dropdown-menu a { color: #333; padding: 15px 20px; font-size: 16px; }
+    .dropdown-menu a:hover { background-color: #f1f1f1; }
+    .dropdown-menu.show { display: block; }
 
-      /* Penyesuaian untuk .content agar pas di bawah top-bar */
-      .content {
-        flex: 1;
-        overflow-y: auto;
-        padding: 30px;
-      }
-
-      /* Penyesuaian di layar mobile */
-      @media (max-width: 768px) {
-        .top-bar { padding: 10px 15px; }
-        .top-bar a { font-size: 40px !important;; }
-        .top-bar a #userNipDisplay { display: none; } /* Sembunyikan nama di mobile */
-        .dropdown-menu { min-width: 160px; }
-        .content { padding: 15px; }
-      }
-
-      .content {
-        flex: 1;
-        padding: 40px 30px;
-        overflow-y: auto;
-        box-sizing: border-box;
-        min-width: 0;
-      }
-
-      .form-container {
-        background: white;
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 0 12px rgba(0, 0, 0, 0.12);
-      }
-
-      h2, h3 {
-        text-align: center;
-        color: #000000;
-        font-size: 32px !important;
-      }
-
-      label {
-        display: block;
-        margin-top: 20px;
-        font-weight: bold;
-        font-size: 16px;
-        margin-bottom: 10px;
-      }
-
-      /*input {
-        width: 100%;
-        height: 60px !important;
-        padding: 18px 20px !important;
-        font-size: 26px !important;
-        font-style: italic;
-        margin-top: 12px;
-        border-radius: 12px !important;
-        border: 1px solid #ccc;
-        box-sizing: border-box;
-      }*/
-      .form-container input {
-        width: 100%;
-        height: 60px !important;
-        padding: 18px 20px !important;
-        font-size: 26px !important;
-        font-style: italic;
-        margin-top: 12px;
-        border-radius: 12px !important;
-        border: 1px solid #ccc;
-        box-sizing: border-box;
-      }
-
-      input.flatpickr-input {
-        font-size: 32px !important;
-        padding: 30px !important;
-        border-radius: 10px;
-        border: 1px solid #ccc;
-        width: 100%;
-        box-sizing: border-box;
-      }
-
-      button {
-        margin-top: 35px;
-        background-color: #d80000;
-        color: white;
-        font-weight: bold;
-        border: none;
-        cursor: pointer;
-        font-size: 20px;
-        padding: 18px 32px;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-        display: block;
-        width: 100%;
-        max-width: 300px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      button:hover {
-        background-color: #a80000;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      }
-
-      .flatpickr-input::placeholder {
-        font-size: 30px !important;
-        margin-top: -100px !important;
-        color: #888;   
-      }
-
-      input[type="date"],
-      input[type="time"],
-      input[type="datetime-local"],
-      select {
-        font-size: 24px;
-        padding: 18px 16px;
-        border-radius: 10px;
-        border: 2px solid #ccc;
-        margin-top: 12px;
-        width: 100%;
-        box-sizing: border-box;
-      }
-
-      .form-container h3:first-of-type {
-        margin-top: -20px;
-      }
-
-      .riwayat-container {
-          background: white;
-          max-width: 1000px; /* max-width ini penting untuk centering */
-          
-          /* FIX: Atur margin atas 0, kanan-kiri auto, dan bawah 30px.
-            'auto' pada margin kiri dan kanan akan membuatnya otomatis ke tengah.
-          */
-          margin: 0 auto 30px auto; 
-          
-          padding: 30px 25px;
-          border-radius: 12px;
-          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-      }
-
-      /* Penyesuaian judul riwayat */
-      #riwayat-section h2 {
-        margin-bottom: 20px !important; /* Jarak bawah judul ke container */
-        text-align: center;
-        display: block;
-        width: 100%;
-      }
-
-      .riwayat-container table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 34px !important;
-        min-width: 600px;
-        table-layout: auto;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      }
-
-      .riwayat-container th, 
-      .riwayat-container td {
-        border: 1px solid #ddd;
-        padding: 14px 16px;
-        text-align: center;
-        white-space: nowrap;
-      }
-
-      .riwayat-container th {
-        background-color: #f9f9f9;
-        color: #d80000;
-        font-weight: bold;
-        font-size: 32px !important;
-      }
-
-      .riwayat-container td {
-        font-size: 32px !important;
-        color: #333;
-        background-color: #fff;
-      }
-
-      .riwayat-container h3 {
-        font-size: 26px;
-        color: #d80000;
-        margin-bottom: 25px;
-        text-align: center;
-        font-weight: 600;
-      }
-
-      .riwayat-container tr:nth-child(even) td {
-        background-color: #f7f7f7;
-      }
-
-      #jumlahLibur{
-        display: block;
-      }
-
-
-    /* MOBILE STYLES (exactly as in original) */
-    @media only screen and (max-width: 1080px) {
-      .flatpickr-calendar {
-        font-size: 16px; /* agak dibesarin biar jelas */
-      }
-
-      .flatpickr-months {
-        height: auto !important; /* pastikan tidak kepotong */
-        padding: 5px 0 !important;
-      }
-
-      .flatpickr-month {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-      }
-
-      .flatpickr-current-month {
-        padding-top: 0 !important;
-        height: auto !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-weight: bold;
-        font-size: 16px !important;
-      }
-
-      /* Tombol prev & next supaya tidak nutup tulisan */
-      .flatpickr-prev-month,
-      .flatpickr-next-month {
-        top: 5px !important;
-      }
-      /* Label */
-      #labelCuti{
-        font-size: 20px !important;
-        font-weight: bold;
-        color: #666666;
-        display: block;
-        padding: 8px;
-        padding: 10px !important;
-      }
-      #labelCutiLain{
-        font-size: 20px !important;
-        font-weight: bold;
-        color: #666666;
-        display: block;
-        padding: 8px !important;
-      }
-      #labelLibur{
-          font-size: 20px !important;
-          font-weight: bold;
-          color: #666666;
-          display: block;
-          margin-top : 20px !important;
-          margin-bottom: -20px !important;
-        }
-      input[type="number"]::placeholder,
-      input::placeholder {
-        font-size: 24px !important;
-        font-style: italic;
-      }
-
-      body {
-        margin: 0;
-        padding: 0;
-        background: #f7f7f7;
-        font-size: 18px;
-        display: block;
-        height: auto;
-        overflow-x: hidden;
-      }
-
-      .sidebar {
-        width: 100%;
-        height: 50px;
-        flex-direction: row;
-        overflow-x: auto;
-        border-right: none;
-        border-bottom: 1px solid #ddd;
-        padding: 25px 20px;
-        box-shadow: none;
-        position: relative;
-        display: flex;
-        flex-direction: row;
-        margin-bottom: 20px;
-      }
-
-      .sidebar h2 {
-        display: none;
-      }
-
-      .sidebar-buttons-wrapper {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        padding: 0 10px;
-        box-sizing: border-box;
-      }
-
-      #goToPengajuanUlang {
-        margin-top: 15px !important;
-        margin-left: 8px;
-      }
-
-      #logoutButton {
-        margin-top: 15px !important;
-        margin-right: 45px !important;
-      }
-
-      .sidebar-buttons-wrapper a {
-        font-size: 30px;
-        padding: 10px;
-        border-radius: 10px;
-        background-color: #f0f0f0;
-        text-decoration: none;
-        color: #333;
-        font-weight: bold;
-        margin-bottom: 20 px;
-      }
-
-      .sidebar a:hover {
-        background-color: #d80000;
-        color: #fff;
-      }
-
-      .content {
-        width: 100%;
-        padding: 20px;
-        margin-top: 20px;
-        overflow: visible;
-      }
-
-      .form-container {
-        width: 90%;
-        margin: 0 auto 30px auto;
-        padding: 20px auto;
-        box-sizing: border-box;
-        overflow: visible;
-        max-height: none;
-        margin-top: 40px !important;
-        margin-left: 30px !important;
-      }
-
-      .riwayat-container {
-        background: white;
-        width:90%;
-        margin: 30px auto;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
-        overflow-x: auto;
-        box-sizing: border-box;
-      }
-
-      .riwayat-container table {
-        width: 100%;
-        min-width: 300px;
-        border-collapse: collapse;
-        font-size: 32px !important;
-        padding: 20 px;
-        text-align : left;
-      }
-
-      .riwayat-container th, 
-      .riwayat-container td {
-        border: 1px solid #ccc;
-        padding: 10px 14px;
-        text-align: center;
-      }
-      .riwayat-container h4 {
-        text-align: center;
-        margin-bottom: 10px;
-        font-size: 32px !important;
-        color: #000000;
-        padding: 15 px;
-      }
-
-      h2, h3 {
-        font-size: 40px !important;
-      }
-
-      label {
-        font-size: 16px;
-      }
-
-      input[type="date"],
-      input[type="time"],
-      input[type="datetime-local"],
-      select {
-        font-size: 38px;
-        padding: 18px 20px;
-        border-radius: 12px;
-        border: 1.8px solid #ccc;
-        margin-top: 14px;
-        width: 80%;
-        box-sizing: border-box;
-      }
-
-      button {
-        width: 75%;
-        padding: 28px 40px;
-        background: #d80000;
-        border: none;
-        color: white;
-        font-weight: bold;
-        font-size: 30px;
-        cursor: pointer;
-        border-radius: 100px;
-        margin-top: 28px;
-        margin-bottom:25px;
-      }
-
-      .message {
-        font-size: 16px;
-        padding: 16px;
-      }
-
-      .notice {
-        font-size: 12px !important;
-        font-weight: normal;
-        color: #d80000;
-        text-align: center;
-        margin-top: 16px;
-      }
-
-      input.flatpickr-input {
-        font-size: 32px !important;
-        padding: 10px !important;
-        border-radius: 12px;
-        border: 1.8px solid #ccc;
-        margin-top: 14px;
-        width: 100%;
-        box-sizing: border-box;
-        margin-top:-50px;
-      }
-
-      .flatpickr-input::placeholder {
-        font-size: 30px !important;
-        margin-top: -100px !important;
-        color: #888;   
-      }
+    /* KONTEN UTAMA & FORM */
+    .content { flex: 1; overflow-y: auto; padding: 30px; }
+    .form-container {
+      background: white; max-width: 1000px; margin: 0 auto; padding: 30px;
+      border-radius: 12px; box-shadow: 0 0 12px rgba(0, 0, 0, 0.12);
     }
 
- .popup {
-  display: none;
-  position: fixed;
-  z-index: 9999;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  justify-content: center;
-  align-items: center;
-}
+    h2 { font-size: 30px; margin-bottom: 30px; }
+    h3 { font-size: 24px; }
+    h2, h3 { text-align: center; color: #000000; }
 
-.popup-content {
-  position: relative;
-  background: #fff;
-  padding: 20px 25px;
-  border-radius: 12px;
-  width: 350px;
-  text-align: left;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  animation: fadeIn 0.3s ease;
-  font-family: Arial, sans-serif;
-}
+    label {
+      display: block; margin-top: 25px; font-weight: bold;
+      font-size: 18px; margin-bottom: 12px;
+    }
+    #labelLibur { margin-bottom: 20px; }
 
-.popup-content h3 {
-  margin-top: 0;
-  text-align: center;
-  color: #333;
-}
+    .form-container input {
+      width: 100%; padding: 14px 18px; font-size: 16px; font-style: italic;
+      margin-top: 8px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box;
+    }
 
-.popup-message {
-  font-size: 14px;
-  line-height: 1.6;
-  margin-top: 10px;
-}
+    button[type="submit"] {
+      margin-top: 40px; background-color: #d80000; color: white; font-weight: bold;
+      border: none; cursor: pointer; font-size: 18px; padding: 15px 30px;
+      border-radius: 10px; transition: all 0.3s ease; display: block;
+      width: 100%; max-width: 320px; margin-left: auto; margin-right: auto;
+    }
+    button[type="submit"]:hover {
+      background-color: #a80000; transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
 
-.popup-message .success {
-  color: green;
-}
-
-.popup-message .error {
-  color: red;
-}
-
-.close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 22px;
-  cursor: pointer;
-  color: #666;
-  transition: 0.2s;
-}
-
-.close:hover {
-  color: #000;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-/* Universal Custom Modal */
-.custom-modal {
-  display: none;
-  position: fixed;
-  z-index: 10000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(5px);
-  justify-content: center;
-  align-items: center;
-  animation: fadeIn 0.3s ease;
-}
-
-.custom-modal.show {
-  display: flex;
-}
-
-.custom-modal-content {
-  background: #fff;
-  padding: 0;
-  border-radius: 16px;
-  width: 400px;
-  max-width: 90%;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  animation: slideIn 0.3s ease;
-  overflow: hidden;
-}
-
-@keyframes slideIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(-50px) scale(0.9); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0) scale(1); 
-  }
-}
-
-.custom-modal-header {
-  color: white;
-  padding: 20px 25px;
-  text-align: center;
-  position: relative;
-}
-
-.custom-modal-header.success {
-  background: linear-gradient(135deg, #28a745, #20c997);
-}
-
-.custom-modal-header.error {
-  background: linear-gradient(135deg, #dc3545, #fd7e14);
-}
-
-.custom-modal-header.warning {
-  background: linear-gradient(135deg, #ffc107, #fd7e14);
-}
-
-.custom-modal-header.info {
-  background: linear-gradient(135deg, #17a2b8, #6f42c1);
-}
-
-.custom-modal-header.logout {
-  background: linear-gradient(135deg, #d80000, #ff4444);
-}
-
-.custom-modal-header h3 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.custom-modal-icon {
-  font-size: 48px;
-  margin-bottom: 10px;
-  opacity: 0.9;
-}
-
-.custom-modal-body {
-  padding: 25px;
-  text-align: center;
-}
-
-.custom-modal-message {
-  font-size: 16px;
-  color: #333;
-  line-height: 1.5;
-  margin-bottom: 25px;
-}
-
-.custom-modal-buttons {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-}
-
-.custom-modal-btn {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 100px;
-}
-
-.custom-modal-btn-cancel {
-  background: #f8f9fa;
-  color: #6c757d;
-  border: 2px solid #e9ecef;
-}
-
-.custom-modal-btn-cancel:hover {
-  background: #e9ecef;
-  border-color: #dee2e6;
-  transform: translateY(-1px);
-}
-
-.custom-modal-btn-confirm {
-  background: linear-gradient(135deg, #d80000, #ff4444);
-  color: white;
-  border: 2px solid #d80000;
-}
-
-.custom-modal-btn-confirm:hover {
-  background: linear-gradient(135deg, #b30000, #e63939);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(216, 0, 0, 0.3);
-}
-
-.custom-modal-btn-success {
-  background: linear-gradient(135deg, #28a745, #20c997);
-  color: white;
-  border: 2px solid #28a745;
-}
-
-.custom-modal-btn-success:hover {
-  background: linear-gradient(135deg, #218838, #1e7e34);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-}
-
-/* Mobile responsive */
-@media (max-width: 768px) {
-  .custom-modal-content {
-    width: 95%;
-    margin: 20px;
-  }
+    /* RIWAYAT */
+    .riwayat-container {
+      background: white; max-width: 1000px; margin: 0 auto 30px auto;
+      padding: 30px 25px; border-radius: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    }
+    #riwayat-section h2 { margin-top: 50px; margin-bottom: 25px !important; }
+    .riwayat-container table {
+      width: 100%; border-collapse: collapse; border-radius: 10px;
+      overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .riwayat-container th, .riwayat-container td {
+      border: 1px solid #ddd; padding: 14px 16px;
+      text-align: center; white-space: nowrap;
+    }
+    .riwayat-container th {
+      background-color: #f9f9f9; color: #d80000; font-weight: bold;
+      font-size: 16px;
+    }
+    .riwayat-container td { font-size: 15px; color: #333; }
+    .riwayat-container h3 { font-size: 22px; color: #d80000; margin-bottom: 20px; }
+    .riwayat-container tr:nth-child(even) td { background-color: #f7f7f7; }
   
-  .custom-modal-header {
-    padding: 15px 20px;
-  }
-  
-  .custom-modal-body {
-    padding: 20px;
-  }
-  
-  .custom-modal-buttons {
-    flex-direction: column;
-  }
-  
-  .custom-modal-btn {
-    width: 100%;
-  }
-}
+    /* MODAL (TETAP SAMA) */
+    .custom-modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); justify-content: center; align-items: center; animation: fadeIn 0.3s ease; }
+    .custom-modal.show { display: flex; }
+    .custom-modal-content { background: #fff; padding: 0; border-radius: 16px; width: 400px; max-width: 90%; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); animation: slideIn 0.3s ease; overflow: hidden; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-50px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .custom-modal-header { color: white; padding: 20px 25px; text-align: center; position: relative; }
+    .custom-modal-header.success { background: linear-gradient(135deg, #28a745, #20c997); }
+    .custom-modal-header.error { background: linear-gradient(135deg, #dc3545, #fd7e14); }
+    .custom-modal-header.warning { background: linear-gradient(135deg, #ffc107, #fd7e14); }
+    .custom-modal-header.info { background: linear-gradient(135deg, #17a2b8, #6f42c1); }
+    .custom-modal-header.logout { background: linear-gradient(135deg, #d80000, #ff4444); }
+    .custom-modal-header h3 { margin: 0; font-size: 20px; font-weight: 600; }
+    .custom-modal-icon .material-icons-outlined { font-size: 48px !important; color: white !important; margin-right: 0; }
+    .custom-modal-body { padding: 25px; text-align: center; }
+    .custom-modal-message { font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 25px; }
+    .custom-modal-buttons { display: flex; gap: 12px; justify-content: center; }
+    .custom-modal-btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; min-width: 100px; }
+    .custom-modal-btn-cancel { background: #f8f9fa; color: #6c757d; border: 2px solid #e9ecef; }
+    .custom-modal-btn-cancel:hover { background: #e9ecef; border-color: #dee2e6; transform: translateY(-1px); }
+    .custom-modal-btn-confirm { background: linear-gradient(135deg, #d80000, #ff4444); color: white; border: 2px solid #d80000; }
+    .custom-modal-btn-confirm:hover { background: linear-gradient(135deg, #b30000, #e63939); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(216, 0, 0, 0.3); }
+    .custom-modal-btn-success { background: linear-gradient(135deg, #28a745, #20c997); color: white; border: 2px solid #28a745; }
+    .custom-modal-btn-success:hover { background: linear-gradient(135deg, #218838, #1e7e34); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3); }
 
+    /* === MOBILE RESPONSIVE STYLES (UNTUK LAYAR DI BAWAH 768px) === */
+    @media (max-width: 768px) {
+      body { display: block; height: auto; }
+      
+      /* PERBAIKAN: Navbar dikecilkan untuk HP */
+      .top-bar { padding: 12px 15px; }
+      .top-bar a { font-size: 14px !important; }
+      .top-bar .material-icons-outlined { font-size: 22px !important; }
+      /* PERBAIKAN: NIP ditampilkan kembali tapi fontnya dikecilkan agar muat */
+      #userNipDisplay { font-size: 14px; } 
 
-    /* (biar tidak terlalu panjang, saya potong, cukup copy paste dari HTML-mu ke sini) */
+      .content { padding: 15px; }
+      .form-container { padding: 20px; }
+      
+      /* PERBAIKAN: Ukuran font konten dikecilkan untuk HP */
+      h2 { font-size: 22px !important; }
+      h3 { font-size: 19px !important; }
+      label { font-size: 16px; }
+      .form-container input { font-size: 15px; padding: 12px 15px; }
+      button[type="submit"] { font-size: 16px; padding: 14px 28px; }
+
+      .riwayat-container { overflow-x: auto; padding: 15px; }
+      .riwayat-container h3 { font-size: 20px; }
+      .riwayat-container th { font-size: 14px; padding: 10px; }
+      .riwayat-container td { font-size: 13px; padding: 10px; }
+
+      .custom-modal-content { width: 95%; margin: 20px; }
+      .custom-modal-buttons { flex-direction: column; }
+      .custom-modal-btn { width: 100%; }
+    }
   </style>
 </head>
 <body>
-  <!-- TOP BAR -->
+
   <div class="top-bar">
     <a id="goToPengajuanUlang" href="/pengajuan-ulang">
       <span class="material-icons-outlined">edit_calendar</span>
@@ -842,106 +198,80 @@
     </div>
   </div>
 
-  <% if (typeof status !== 'undefined' && message) { %>
-  <script>
-    // Tampilkan custom modal untuk status
-    document.addEventListener('DOMContentLoaded', function() {
-      showCustomModal({
-        type: '<%= status === "sukses" ? "success" : "error" %>',
-        title: '<%= status === "sukses" ? "Berhasil" : "Informasi" %>',
-        message: '<%- message %>',
-        icon: '<%= status === "sukses" ? "✅" : "❌" %>',
-        confirmText: 'OK',
-        showCancel: false,
-        onConfirm: () => {}
-      });
-    });
-  </script>
-<% } %>
-
-
-
-  <!-- FORM -->
   <div class="content">
-    <h2 style="text-align:center; color:#d80000; font-size:50px;">Form Pengajuan</h2>
+    <h2>Form Pengajuan</h2>
 
     <div class="form-container">
-  <form method="POST" action="/form">
-    <!-- LIBUR -->
-    <h3>Pengajuan Libur</h3>
-    <label id="labelLibur">Sisa request Libur: <%= data.jatah.liburTersisa %></label>
-    <% if (data.jatah.liburTersisa > 0) { %>
-      <input type="number" id="jumlahLibur" name="jumlahLibur" min="0" max="<%= data.jatah.liburTersisa %>" placeholder="Jumlah libur yang diajukan" />
-      <div id="tanggalLiburContainer"></div>
-    <% } else { %>
-      <input type="text" placeholder="Jatah libur sudah habis" disabled style="background-color: #f5f5f5; color: #999; cursor: not-allowed;" />
-    <% } %>
+      <form method="POST" action="/form">
+        <h3>Pengajuan Libur</h3>
+        <label id="labelLibur">Sisa request Libur: <%= data.jatah.liburTersisa %></label>
+        
+        <div id="tanggalLiburContainer">
+          <% if (data.jatah.liburTersisa <= 0) { %>
+            <input type="text" placeholder="Jatah libur sudah habis" disabled style="background-color: #f5f5f5; color: #999; cursor: not-allowed;" />
+          <% } %>
+        </div>
+        <input type="hidden" name="jumlahLibur" value="<%= data.jatah.liburTersisa > 0 ? data.jatah.liburTersisa : 0 %>">
 
-    <!-- CUTI TAHUNAN -->
-    <h3>Pengajuan Cuti Tahunan</h3>
-    <label id="labelCuti">Sisa Cuti Tahunan: <%= data.jatah.cutiTersisa %></label>
-    <% if (data.jatah.cutiTersisa > 0) { %>
-      <input type="number" id="jumlahCuti" name="jumlahCuti" min="0" max="<%= data.jatah.cutiTersisa %>" placeholder="Jumlah cuti tahunan" />
-      <div id="tanggalCutiContainer"></div>
-    <% } else { %>
-      <input type="text" placeholder="Jatah cuti tahunan sudah habis" disabled style="background-color: #f5f5f5; color: #999; cursor: not-allowed;" />
-    <% } %>
+        <h3>Pengajuan Cuti Tahunan</h3>
+        <label id="labelCuti">Sisa Cuti Tahunan: <%= data.jatah.cutiTersisa %></label>
+        <% if (data.jatah.cutiTersisa > 0) { %>
+          <input type="number" id="jumlahCuti" name="jumlahCuti" min="0" max="<%= data.jatah.cutiTersisa %>" placeholder="Masukkan jumlah cuti tahunan" />
+          <div id="tanggalCutiContainer"></div>
+        <% } else { %>
+          <input type="text" placeholder="Jatah cuti tahunan sudah habis" disabled style="background-color: #f5f5f5; color: #999; cursor: not-allowed;" />
+        <% } %>
 
-    <!-- CUTI CAP -->
-    <h3>Pengajuan Cuti CAP</h3>
-    <label id="labelCutiLain">Sisa Cuti CAP: <%= data.jatah.cutiLainTersisa %></label>
-    <% if (data.jatah.cutiLainTersisa > 0) { %>
-      <input type="number" id="jumlahCutiLain" name="jumlahCutiLain" min="0" max="<%= data.jatah.cutiLainTersisa %>" placeholder="Jumlah cuti CAP" />
-      <div id="tanggalCutiLainContainer"></div>
-    <% } else { %>
-      <input type="text" placeholder="Jatah cuti CAP sudah habis" disabled style="background-color: #f5f5f5; color: #999; cursor: not-allowed;" />
-    <% } %>
+        <h3>Pengajuan Cuti CAP</h3>
+        <label id="labelCutiLain">Sisa Cuti CAP: <%= data.jatah.cutiLainTersisa %></label>
+        <% if (data.jatah.cutiLainTersisa > 0) { %>
+          <input type="number" id="jumlahCutiLain" name="jumlahCutiLain" min="0" max="<%= data.jatah.cutiLainTersisa %>" placeholder="Masukkan jumlah cuti CAP" />
+          <div id="tanggalCutiLainContainer"></div>
+        <% } else { %>
+          <input type="text" placeholder="Jatah cuti CAP sudah habis" disabled style="background-color: #f5f5f5; color: #999; cursor: not-allowed;" />
+        <% } %>
 
-    <center><button type="submit">Ajukan</button></center>
-  </form>
-</div>
+        <center><button type="submit">Ajukan</button></center>
+      </form>
+    </div>
 
-    <!-- RIWAYAT -->
     <div id="riwayat-section">
-      <h2 style="text-align:center; color:#d80000; font-size:50px;">Riwayat Pengajuan</h2>
+      <h2>Riwayat Pengajuan</h2>
       <div class="riwayat-container">
-        <h3>Libur (<%= data.pengajuan.libur.length %>)</h3>
+        <h3>Libur</h3>
         <table>
           <thead><tr><th>No</th><th>Tanggal</th></tr></thead>
           <tbody>
-            <% if (data.pengajuan.libur.length > 0) { %>
-              <% data.pengajuan.libur.forEach((tgl, i) => { %>
-                <tr><td><%= i + 1 %></td><td><%= tgl %></td></tr>
-              <% }) %>
-            <% } else { %>
+            <% data.pengajuan.libur.forEach((tgl, i) => { %>
+              <tr><td><%= i + 1 %></td><td><%= tgl %></td></tr>
+            <% }) %>
+            <% if (data.pengajuan.libur.length === 0) { %>
               <tr><td colspan="2">Tidak ada riwayat</td></tr>
             <% } %>
           </tbody>
         </table>
 
-        <h3>Cuti Tahunan (<%= data.pengajuan.cuti.length %>)</h3>
+        <h3>Cuti Tahunan</h3>
         <table>
           <thead><tr><th>No</th><th>Tanggal</th></tr></thead>
           <tbody>
-            <% if (data.pengajuan.cuti.length > 0) { %>
-              <% data.pengajuan.cuti.forEach((tgl, i) => { %>
-                <tr><td><%= i + 1 %></td><td><%= tgl %></td></tr>
-              <% }) %>
-            <% } else { %>
+            <% data.pengajuan.cuti.forEach((tgl, i) => { %>
+              <tr><td><%= i + 1 %></td><td><%= tgl %></td></tr>
+            <% }) %>
+             <% if (data.pengajuan.cuti.length === 0) { %>
               <tr><td colspan="2">Tidak ada riwayat</td></tr>
             <% } %>
           </tbody>
         </table>
 
-        <h3>Cuti CAP (<%= data.pengajuan.cutiLain.length %>)</h3>
+        <h3>Cuti CAP</h3>
         <table>
           <thead><tr><th>No</th><th>Tanggal</th></tr></thead>
           <tbody>
-            <% if (data.pengajuan.cutiLain.length > 0) { %>
-              <% data.pengajuan.cutiLain.forEach((tgl, i) => { %>
-                <tr><td><%= i + 1 %></td><td><%= tgl %></td></tr>
-              <% }) %>
-            <% } else { %>
+            <% data.pengajuan.cutiLain.forEach((tgl, i) => { %>
+              <tr><td><%= i + 1 %></td><td><%= tgl %></td></tr>
+            <% }) %>
+            <% if (data.pengajuan.cutiLain.length === 0) { %>
               <tr><td colspan="2">Tidak ada riwayat</td></tr>
             <% } %>
           </tbody>
@@ -950,202 +280,95 @@
     </div>
   </div>
 
-  <!-- Universal Custom Modal -->
   <div id="customModal" class="custom-modal">
     <div class="custom-modal-content">
       <div id="modalHeader" class="custom-modal-header">
-        <div id="modalIcon" class="custom-modal-icon">🚪</div>
+        <div id="modalIcon" class="custom-modal-icon"></div>
         <h3 id="modalTitle">Konfirmasi</h3>
       </div>
       <div class="custom-modal-body">
-        <div id="modalMessage" class="custom-modal-message">
-          Apakah Anda yakin?
-        </div>
+        <div id="modalMessage" class="custom-modal-message">Apakah Anda yakin?</div>
         <div id="modalButtons" class="custom-modal-buttons">
-          <button id="modalCancelBtn" class="custom-modal-btn custom-modal-btn-cancel" onclick="hideCustomModal()">
-            Batal
-          </button>
-          <button id="modalConfirmBtn" class="custom-modal-btn custom-modal-btn-confirm" onclick="confirmCustomModal()">
-            Ya
-          </button>
+          <button id="modalCancelBtn" class="custom-modal-btn custom-modal-btn-cancel" onclick="hideCustomModal()">Batal</button>
+          <button id="modalConfirmBtn" class="custom-modal-btn custom-modal-btn-confirm" onclick="confirmCustomModal()">Ya</button>
         </div>
       </div>
     </div>
   </div>
 
-<div id="user-info" data-disable='<%- JSON.stringify(data.disableDatesLibur || []) %>'></div>
-
-<script>
-  const userDiv = document.getElementById("user-info");
-  const disableDatesLibur = JSON.parse(userDiv.dataset.disable);
-  console.log(disableDatesLibur);
-</script>
-
+  <div id="server-data" style="display:none;" 
+       data-disable-dates-libur='<%- JSON.stringify(data.disableDatesLibur || []) %>'
+       data-libur-tersisa="<%= data.jatah.liburTersisa %>"
+       data-cuti-tersisa="<%= data.jatah.cutiTersisa %>"
+       data-cutilain-tersisa="<%= data.jatah.cutiLainTersisa %>">
+  </div>
   
+  <% if (typeof status !== 'undefined' && message) { %>
+    <div id="server-message-data" style="display:none;" data-status="<%= status %>">
+        <%- message %>
+    </div>
+  <% } %>
+
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   
-  
-
   <script>
-    function renderTanggalInputLibur(jumlah, containerId,disableDate) {
+    // --- FUNGSI-FUNGSI UTAMA (TIDAK ADA EJS DI SINI) ---
+    function createDatePickers(jumlah, containerId, namePrefix, disableDates, isLibur = false) {
       const container = document.getElementById(containerId);
       container.innerHTML = "";
       for (let i = 1; i <= jumlah; i++) {
         const input = document.createElement("input");
         input.type = "text";
-        input.name = `${containerId}_tanggal${i}`;
+        input.name = `${namePrefix}_tanggal${i}`;
         input.placeholder = `Pilih Tanggal ${i}`;
+        input.required = true;
         container.appendChild(input);
 
-        flatpickr(input, {
-          dateFormat: "Y-m-d",
-          minDate: "today",
-          disable: disableDate
-        });
-      }
-    }
-
-    function renderTanggalInputCuti(jumlah, containerId,disableDate) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = "";
-      for (let i = 1; i <= jumlah; i++) {
-        const input = document.createElement("input");
-        input.type = "text";
-        input.name = `${containerId}_tanggal${i}`;
-        input.placeholder = `Pilih Tanggal ${i}`;
-        container.appendChild(input);
-
-        flatpickr(input, {
+        let config = {
           dateFormat: "Y-m-d",
           minDate: "today"
-          
-        });
+        };
+        
+        if (isLibur) {
+          config.disable = disableDates;
+        }
+
+        flatpickr(input, config);
       }
     }
 
-    // Auto render libur berdasarkan sisa jatah
-    function renderLiburAuto() {
-      const container = document.getElementById("tanggalLiburContainer");
-      if (container) {
-        const liburTersisa = parseInt(container.getAttribute("data-libur-tersisa"));
-        if (liburTersisa > 0) {
-          renderTanggalInput(liburTersisa, "tanggalLiburContainer");
-          // Set hidden input untuk jumlah libur
-          const hiddenInput = document.createElement("input");
-          hiddenInput.type = "hidden";
-          hiddenInput.name = "jumlahLibur";
-          hiddenInput.value = liburTersisa;
-          container.appendChild(hiddenInput);
-        } else {
-          // Jatah habis - tidak perlu hidden input
-          console.log("Jatah libur sudah habis");
-        }
-      }
-    }
-
-    // Auto render libur saat halaman dimuat
-   // document.addEventListener('DOMContentLoaded', function() {
-     // renderLiburAuto();
-    //});
-    
-   const jumlahLibur=document.getElementById("jumlahLibur");
-   const jumlahCuti=document.getElementById("jumlahCuti");
-   const jumlahCutiLain=document.getElementById("jumlahCutiLain");
-
-
-   if(jumlahLibur){
-     document.getElementById("jumlahLibur").addEventListener("input", e => {
-      renderTanggalInputLibur(e.target.value, "tanggalLiburContainer",disableDatesLibur);
-    });
-   }
-   if(jumlahCuti){
-     document.getElementById("jumlahCuti").addEventListener("input", e => {
-      renderTanggalInputCuti(e.target.value, "tanggalCutiContainer",disableDatesLibur);
-    });
-   }
-   if(jumlahCutiLain){
-     document.getElementById("jumlahCutiLain").addEventListener("input", e => {
-      renderTanggalInputCuti(e.target.value, "tanggalCutiLainContainer",disableDatesLibur);
-    });
-   }
-  
-    
-
-
-    // Dropdown functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      const dropdownToggle = document.getElementById('userDropdownToggle');
-      const dropdownMenu = document.getElementById('userDropdownMenu');
-      const logoutLink = document.getElementById('logoutLink');
-
-      // Toggle dropdown
-      dropdownToggle.addEventListener('click', function(e) {
-        e.preventDefault();
-        dropdownMenu.classList.toggle('show');
-      });
-
-      // Close dropdown when clicking outside
-      document.addEventListener('click', function(e) {
-        if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
-          dropdownMenu.classList.remove('show');
-        }
-      });
-
-      // Logout confirmation
-      logoutLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        showCustomModal({
-          type: 'logout',
-          title: 'Konfirmasi Logout',
-          message: 'Apakah Anda yakin ingin keluar dari sistem?',
-          icon: '🚪',
-          confirmText: 'Ya, Logout',
-          onConfirm: () => window.location.href = '/logout'
-        });
-      });
-    });
-
-    // Universal modal functions
     let currentModalCallback = null;
-
     function showCustomModal(options) {
       const modal = document.getElementById('customModal');
       const header = document.getElementById('modalHeader');
-      const icon = document.getElementById('modalIcon');
+      const iconEl = document.getElementById('modalIcon');
       const title = document.getElementById('modalTitle');
       const message = document.getElementById('modalMessage');
       const confirmBtn = document.getElementById('modalConfirmBtn');
       const cancelBtn = document.getElementById('modalCancelBtn');
-
-      // Set modal content
-      icon.textContent = options.icon || '❓';
+      
+      const icons = {
+          success: 'check_circle', error: 'error', warning: 'warning',
+          info: 'info', logout: 'logout'
+      };
+      
+      const iconName = icons[options.type] || 'help_outline';
+      
+      iconEl.innerHTML = `<span class="material-icons-outlined">${iconName}</span>`;
       title.textContent = options.title || 'Konfirmasi';
-      message.textContent = options.message || 'Apakah Anda yakin?';
+      message.innerHTML = options.message || 'Apakah Anda yakin?'; 
       confirmBtn.textContent = options.confirmText || 'Ya';
       
-      // Set header style based on type
       header.className = `custom-modal-header ${options.type || 'info'}`;
-      
-      // Set button style based on type
       confirmBtn.className = `custom-modal-btn ${options.type === 'success' ? 'custom-modal-btn-success' : 'custom-modal-btn-confirm'}`;
       
-      // Store callback
       currentModalCallback = options.onConfirm || null;
-      
-      // Show/hide cancel button
-      if (options.showCancel === false) {
-        cancelBtn.style.display = 'none';
-      } else {
-        cancelBtn.style.display = 'block';
-      }
-      
-      // Show modal
+      cancelBtn.style.display = (options.showCancel === false) ? 'none' : 'flex';
       modal.classList.add('show');
     }
 
     function hideCustomModal() {
-      const modal = document.getElementById('customModal');
-      modal.classList.remove('show');
+      document.getElementById('customModal').classList.remove('show');
       currentModalCallback = null;
     }
 
@@ -1155,48 +378,95 @@
       }
       hideCustomModal();
     }
-
-    // Close modal when clicking outside
-    document.getElementById('customModal').addEventListener('click', function(e) {
-      if (e.target === this) {
-        hideCustomModal();
+    
+    // --- LOGIKA UTAMA SETELAH HALAMAN SIAP ---
+    document.addEventListener('DOMContentLoaded', function() {
+      const serverData = document.getElementById("server-data");
+      const disableDatesLibur = JSON.parse(serverData.dataset.disableDatesLibur);
+      const sisaLibur = parseInt(serverData.dataset.liburTersisa, 10);
+      const sisaCuti = parseInt(serverData.dataset.cutiTersisa, 10);
+      const sisaCutiLain = parseInt(serverData.dataset.cutilainTersisa, 10);
+      
+      if (sisaLibur > 0) {
+        createDatePickers(sisaLibur, 'tanggalLiburContainer', 'tanggalLiburContainer', disableDatesLibur, true);
+        const jumlahLiburInput = document.getElementById('jumlahLibur');
+        if (jumlahLiburInput) {
+           jumlahLiburInput.style.display = 'none';
+        }
       }
-    });
 
-    // Close modal with Escape key
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        hideCustomModal();
+      function setupCutiInput(inputId, containerId, maxJatah) {
+          const inputElement = document.getElementById(inputId);
+          if (!inputElement) return;
+
+          inputElement.addEventListener('input', e => {
+              let jumlahDiajukan = parseInt(e.target.value, 10);
+              if (isNaN(jumlahDiajukan) || jumlahDiajukan < 0) {
+                  jumlahDiajukan = 0;
+              }
+
+              if (jumlahDiajukan > maxJatah) {
+                  showCustomModal({
+                      type: 'warning',
+                      title: 'Peringatan',
+                      message: `Jumlah pengajuan (${jumlahDiajukan}) melebihi sisa jatah (${maxJatah}).`,
+                      confirmText: 'Mengerti',
+                      showCancel: false
+                  });
+                  e.target.value = '';
+                  createDatePickers(0, containerId, containerId, []);
+              } else {
+                  createDatePickers(jumlahDiajukan, containerId, containerId, []);
+              }
+          });
       }
-    });
 
-    // Replace all alert() calls with custom modal
-    window.alert = function(message) {
-      showCustomModal({
-        type: 'info',
-        title: 'Informasi',
-        message: message,
-        icon: 'ℹ️',
-        confirmText: 'OK',
-        showCancel: false,
-        onConfirm: () => {}
+      setupCutiInput('jumlahCuti', 'tanggalCutiContainer', sisaCuti);
+      setupCutiInput('jumlahCutiLain', 'tanggalCutiLainContainer', sisaCutiLain);
+      
+      const dropdownToggle = document.getElementById('userDropdownToggle');
+      const dropdownMenu = document.getElementById('userDropdownMenu');
+      const logoutLink = document.getElementById('logoutLink');
+
+      dropdownToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        dropdownMenu.classList.toggle('show');
       });
-    };
 
-    // Replace all confirm() calls with custom modal
-    window.confirm = function(message) {
-      return new Promise((resolve) => {
+      document.addEventListener('click', function(e) {
+        if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+          dropdownMenu.classList.remove('show');
+        }
+      });
+
+      logoutLink.addEventListener('click', function(e) {
+        e.preventDefault();
         showCustomModal({
-          type: 'warning',
-          title: 'Konfirmasi',
-          message: message,
-          icon: '⚠️',
-          confirmText: 'Ya',
-          onConfirm: () => resolve(true),
-          onCancel: () => resolve(false)
+          type: 'logout',
+          title: 'Konfirmasi Logout',
+          message: 'Apakah Anda yakin ingin keluar dari sistem?',
+          confirmText: 'Ya, Logout',
+          onConfirm: () => window.location.href = '/logout'
         });
       });
-    };
+      
+      const messageContainer = document.getElementById('server-message-data');
+      if (messageContainer) {
+          const status = messageContainer.dataset.status;
+          const message = messageContainer.innerHTML;
+          
+          showCustomModal({
+            type: status === 'sukses' ? 'success' : 'error',
+            title: status === 'sukses' ? 'Pengajuan Berhasil' : 'Terjadi Kesalahan',
+            message: message, 
+            confirmText: 'OK',
+            showCancel: false
+          });
+      }
+      
+      document.getElementById('customModal').addEventListener('click', (e) => (e.target === e.currentTarget) && hideCustomModal());
+      document.addEventListener('keydown', (e) => (e.key === 'Escape') && hideCustomModal());
+    });
   </script>
 </body>
 </html>

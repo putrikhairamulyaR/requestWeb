@@ -455,11 +455,12 @@ async function resetPengajuan(req, res) {
     // Delete only libur and cuti lainnya requests (not cuti tahunan)
     const deleteRequestsQuery = `
       DELETE FROM request 
-      WHERE jenis_pengajuan IN ('Libur', 'Cuti Lainnya','cuti','libur','cuti lainnya')
+      WHERE jenis_pengajuan IN ('Libur', 'Cuti Lainnya')
     `;
     const [deleteResult] = await pool.query(deleteRequestsQuery);
     console.log('Delete requests result:', deleteResult);
     
+    // Reset cutiTerpakai to 0 for all users
     
     
     res.json({ 
@@ -494,12 +495,12 @@ async function undoResetPengajuan(req, res) {
         VALUES (?, ?, ?, ?, ?, ?)
       `;
       await pool.query(insertQuery, [
-        record.timestamp,
+        new Date(record.timestamp),
         record.nip,
         record.jenis_pengajuan,
         record.status_pengajuan,
-        record.tanggal,
-        record.tanggal_lama
+        new Date(record.tanggal),
+        record.tanggal_lama ? new Date(record.tanggal_lama) : null
       ]);
       restoredCount++;
     }

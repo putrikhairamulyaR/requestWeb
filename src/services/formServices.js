@@ -27,9 +27,9 @@ async function getInitialData(token) {
 
   let totalLibur = 0, totalCuti = 0, totalCutiLain = 0;
   jatahCounts.forEach(row => {
-    if (row.jenis === 'libur') totalLibur = row.total;
-    if (row.jenis === 'cuti') totalCuti = row.total;
-    if (row.jenis === 'cuti lainnya') totalCutiLain = row.total;
+    if (row.jenis === 'Libur') totalLibur = row.total;
+    if (row.jenis === 'Cuti') totalCuti = row.total;
+    if (row.jenis === 'Cuti Lainnya') totalCutiLain = row.total;
   });
 
   const jatah = {
@@ -40,13 +40,13 @@ async function getInitialData(token) {
 
   const pengajuan = { libur: [], cuti: [], cutiLain: [] };
   userRequests.forEach(req => {
-    const jenis = req.jenis_pengajuan.toLowerCase().trim();
-    if (jenis === 'libur') pengajuan.libur.push(req.tanggal_str);
-    if (jenis === 'cuti') pengajuan.cuti.push(req.tanggal_str);
-    if (jenis === 'cuti lainnya') pengajuan.cutiLain.push(req.tanggal_str);
+    const jenis = req.jenis_pengajuan.trim();
+    if (jenis === 'Libur') pengajuan.libur.push(req.tanggal_str);
+    if (jenis === 'Cuti') pengajuan.cuti.push(req.tanggal_str);
+    if (jenis === 'Cuti Lainnya') pengajuan.cutiLain.push(req.tanggal_str);
   });
 
-  // Remove duplicates from each array
+  
   pengajuan.libur = [...new Set(pengajuan.libur)];
   pengajuan.cuti = [...new Set(pengajuan.cuti)];
   pengajuan.cutiLain = [...new Set(pengajuan.cutiLain)];
@@ -80,17 +80,18 @@ async function processPengajuan(token, formData) {
     }
 
     const allDates = {
-      libur: extractDates("tanggalLiburContainer", formData.jumlahLibur),
-      cuti: extractDates("tanggalCutiContainer", formData.jumlahCuti),
-      "cuti lainnya": extractDates("tanggalCutiLainContainer", formData.jumlahCutiLain)
+      Libur: extractDates("tanggalLiburContainer", formData.jumlahLibur),
+      Cuti: extractDates("tanggalCutiContainer", formData.jumlahCuti),
+      "Cuti Lainnya": extractDates("tanggalCutiLainContainer", formData.jumlahCutiLain)
     };
 
     for (const jenis in allDates) {
       for (const tanggal of allDates[jenis]) {
         try {
           let quotaKey =
-            jenis === "libur" ? "LIBUR" :
-            jenis === "cuti" ? "CUTI" : "CUTI_LAINNYA";
+            jenis === "Libur" ? "LIBUR" :
+            jenis === "Cuti" ? "CUTI" : 
+            jenis === "Cuti Lainnya"?"CUTI_LAINNYA":"";
           const maxQuota = CONFIG.QUOTA[quotaKey];
 
           // Mulai transaksi
@@ -113,7 +114,7 @@ async function processPengajuan(token, formData) {
           }
 
           // 🔹 Cek kuota global dengan lock
-          if (jenis === "libur") {
+          if (jenis === "Libur") {
             const totalOnDate = await Request.countByJenisTanggalForUpdate(connection, jenis, tanggal);
             if (totalOnDate >= 3) {
               await connection.rollback();

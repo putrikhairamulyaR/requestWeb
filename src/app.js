@@ -7,6 +7,9 @@ const cors = require('cors');
 const session = require('cookie-session');
 
 
+
+// baru setelah itu pakai app.use
+
 const authRoutes = require('./routes/auth');
 
 // =================================================================
@@ -19,6 +22,7 @@ const app = express();
 // =================================================================
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, "..", "views"));
+app.use(express.static(path.join(__dirname, "../public")));
 
 // =================================================================
 // MIDDLEWARE
@@ -29,8 +33,6 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '../public')));
-
 app.use(
   session({
     name: "session",
