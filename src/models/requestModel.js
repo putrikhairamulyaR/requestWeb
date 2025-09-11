@@ -7,10 +7,10 @@ class Request {
    */
   static async countByUser(nip) {
     const sql = `
-      SELECT LOWER(jenis_pengajuan) AS jenis, COUNT(*) AS total
+      SELECT jenis_pengajuan AS jenis, COUNT(*) AS total
       FROM request 
       WHERE nip = ?
-      GROUP BY LOWER(jenis_pengajuan)`;
+      GROUP BY jenis_pengajuan`;
     const [rows] = await pool.query(sql, [nip]);
     return rows;
   }
@@ -58,7 +58,7 @@ class Request {
     const sql = `
       SELECT DATE_FORMAT(tanggal, '%Y-%m-%d') AS tgl
       FROM request
-      WHERE jenis_pengajuan = 'libur'
+      WHERE jenis_pengajuan = 'Libur'
       GROUP BY tanggal
       HAVING COUNT(*) >= ?`;
     const [rows] = await pool.query(sql, 3);
